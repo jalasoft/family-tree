@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="cs">
+    <head>
+      <meta charset="utlf-8"/>
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+      <link rel="stylesheet" type="text/css" href="/static/bootstrap.css">
+		
+      <script src="/static/svg_pencil.js"></script>
+      <script src="/static/genealogy.js"></script>
+      
+    </head>
+    <body>
+        <div class="container">
+        	
+        	<div class="jumbotron py-2 mt-4 text-center bg-success text-white">
+        		<div class="display-4 font-weight-bold">Rodokmen</div>
+        		<p class="lead">rodu <span class="font-weight-bold">Laštovičků</span></p>
+        	</div>
+        	<ul class="nav nav-tabs">
+  				<li class="nav-item">
+  					<a class="nav-link active lead" href="#familytree" data-toggle="tab">Rodokmen</a>
+  				</li>
+  				<li class="nav-item">
+  					<a class="nav-link lead" href="#info" data-toggle="tab">Stručný popis rodu</a>
+  				</li>
+			</ul>
+
+			<div class="tab-content">
+				<div class="tab-pane active" id="familytree">
+					
+				</div>
+				<div class="tab-pane" id="info">
+					<div class="card w-25 mt-4">
+						<div class="card-header bg-warning text-white">Hemeroidy</div>
+						<div class="card-body">
+							<h3 class="card-title">Co to je hemeroid</h3>
+							<p class="card-text text-muted">Mit hemeroidy je pruser, at si kdo chce co chce rika....</p>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<script type="text/javascript">
+
+    (function() {
+
+      var tata = Genealogy.newMale({
+        name: "Jiri",
+        surname: "Lastovicka",
+        birth: "16.4.1952"
+      });
+
+      var mama = Genealogy.newFemale({
+        name: "Eva",
+        surname: "Navratilova",
+        birth: "14.9.1951"
+      });
+
+      var ja = Genealogy.newMale({
+        name: "Honza", 
+        surname: "Laštovička", 
+        birth: "11.11.1983"
+      });
+
+      var monika = Genealogy.newFemale({
+        name: "Monika",
+        surname: "Lastovickova",
+        birth: "6.6.1976"
+      });
+
+      tata.inRelationWith(mama).having(ja).having(monika);
+
+      console.log(ja);
+      console.log(monika);
+      console.log(tata);
+      console.log(mama);
+
+      Genealogy.renderFamilyTree(ja, {
+        width: "100%",
+        height: "100%",
+        el: "#familytree"
+      });
+
+
+    })();
+			
+			</script>
+    </body>
+</html>
