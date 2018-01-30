@@ -71,17 +71,48 @@
 
       tata.inRelationWith(mama).having(ja).having(monika);
 
+      var babickaN = Genealogy.newFemale({
+        name: "Eva",
+        surname: "Hamplova",
+        birth: "28.10. 1930"
+      });
+
+      var josefN = Genealogy.newMale({
+        name: "Josef",
+        surname: "Navratil",
+        birth: "11.5. 1923",
+        decease: "25.12. 1969"
+      });
+
+      josefN.inRelationWith(babickaN).having(mama);
+
+      var babickaC = Genealogy.newFemale({
+        name: "Marie",
+        surname: "Leinmullerova",
+        birth: "14.3. 1927"
+      });
+
+      dedaL = Genealogy.newMale({
+        name: "Josef",
+        surname: "Lastovicka",
+        birth: "16.8. 1922",
+        decease: "19.7.1997"
+      });
+
+
+      babickaC.inRelationWith(dedaL).having(tata);
+
       console.log(ja);
       console.log(monika);
       console.log(tata);
       console.log(mama);
+
 
       Genealogy.renderFamilyTree(ja, {
         width: "100%",
         height: "100%",
         el: "#familytree"
       });
-
 
     })();
 			

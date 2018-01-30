@@ -18,7 +18,7 @@ const SVGPainter = (function(){
 	var attributesApplier = function applyAttributes(target, config) {
 		Object.keys(config).forEach(k => {
 				var value = config[k];
-				target.setAttribute(k, value)
+				target.setAttribute(k, value);
 		});
 	};
 
@@ -29,7 +29,7 @@ const SVGPainter = (function(){
 			this.svg = initDocument(config);
 
 		}
-	}
+	};
 })();
 
 
@@ -41,7 +41,7 @@ SVGPainter.SVGDocument.prototype.rectangle = function(config) {
 	this.svg.appendChild(prim);
 
 	return prim;
-}
+};
 
 SVGPainter.SVGDocument.prototype.text = function(value, config) {
 	var prim = document.createElementNS(this.NS, "text");
@@ -53,7 +53,7 @@ SVGPainter.SVGDocument.prototype.text = function(value, config) {
 
 	this.svg.appendChild(prim);
 	return prim;
-}
+};
 
 SVGPainter.SVGDocument.prototype.linearGradient = function(config) {
 
@@ -82,4 +82,4 @@ SVGPainter.SVGDocument.prototype.linearGradient = function(config) {
 	});
 
 	this.svg.insertAdjacentElement('afterbegin', gradientElement);
-}
+};

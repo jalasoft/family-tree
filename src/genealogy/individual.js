@@ -22,7 +22,8 @@
 
   //--------------------------------------------------------------------------------------------------------------------------------
   //--------------------------------------------------------------------------------------------------------------------------------
-  
+  //--------------------------------------------------------------------------------------------------------------------------------
+
   Genealogy.internal.Individual = function(config) {
   
     this.name = config.name ? config.name : "????";
@@ -35,14 +36,20 @@
     this.relationships = [];
   };
 
+  //--------------------------------------------------------------------------------------------------------------------------------
+
   Genealogy.internal.Individual.prototype.isMale = function() {
     return this.gender == Genealogy.GENDER_MALE;
-  }
+  };
 
+  //--------------------------------------------------------------------------------------------------------------------------------
+  
   Genealogy.internal.Individual.prototype.isFemale = function() {
     return this.gender == Genealogy.GENDER_FEMALE;
-  }
+  };
 
+  //--------------------------------------------------------------------------------------------------------------------------------
+  
   Genealogy.internal.Individual.prototype.inRelationWith = function(anotherIndividual) {
   
     if (!(anotherIndividual instanceof Genealogy.internal.Individual)) {
@@ -55,11 +62,43 @@
     anotherIndividual.relationships.push(newRelationship);
 
     return newRelationship;
-  }
+  };
 
+
+  //--------------------------------------------------------------------------------------------------------------------------------
+  
   Genealogy.internal.Individual.prototype.toString = function() {
-    return `Individual[${this.id}]`
-  }
+    return `Individual[${this.id}]`;
+  };
+
+  //--------------------------------------------------------------------------------------------------------------------------------
+  
+  Object.defineProperty(Genealogy.internal.Individual.prototype, "father", {
+      enumerable: true,
+      get() {
+        return this.parentRelationship ? this.parentRelationship.father : undefined;
+      }
+  });
+
+  //--------------------------------------------------------------------------------------------------------------------------------
+  
+  Object.defineProperty(Genealogy.internal.Individual.prototype, "mother", {
+      enumerable: true,
+      get() {
+        return this.parentRelationship ? this.parentRelationship.mother : undefined;
+      }
+  });
+
+  //--------------------------------------------------------------------------------------------------------------------------------
+
+  Object.defineProperty(Genealogy.internal.Individual.prototype, "siblings", {
+      enumerable: true,
+      get() {
+        return this.parentRelationship ? this.parentRelationship.children.filter(s => s != this) : [];
+      }
+  });
+
+  //--------------------------------------------------------------------------------------------------------------------------------
 
   Object.defineProperty(Genealogy.internal.Individual.prototype, "id", {
     enumerable: true,
@@ -68,4 +107,6 @@
       return `${this.name}_${this.surname}_${this.birth}`;
     }
   });
+
+  //--------------------------------------------------------------------------------------------------------------------------------
 

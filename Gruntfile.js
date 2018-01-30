@@ -26,14 +26,21 @@ module.exports = function(grunt) {
 			}
 		},
 		watch: {
-			files: ['src/genealogy/*.js', 'src/svg_pencil/*.js'],
+			files: ['src/genealogy/*.js', 'src/svg_pencil/*.js', 'src/main.html'],
 			tasks: ['concat:dist', 'copy:dist']
+		},
+		jshint: {
+			options: {
+				esversion: 6
+			},
+			files: ['src/genealogy/*.js', 'src/svg_pencil/*.js']
 		}
 	});
 
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-watch');
+	grunt.loadNpmTasks('grunt-contrib-jshint');
 
 	grunt.registerTask('default', ['concat:dist', 'copy:dist']);
 

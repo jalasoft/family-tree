@@ -5,7 +5,7 @@ Genealogy.newRelationship = function(person1, person2) {
     }
 
     var father = person1.isMale() ? person1 : person2.isMale() ? person2 : undefined;
-    var mother = person1.isFemale() ? person11 : person2.isFemale() ? person2 : undefined;
+    var mother = person1.isFemale() ? person1 : person2.isFemale() ? person2 : undefined;
 
     if (!father) {
       throw new TypeError("None of the provided two persons is a male to be set as a father of a new relationship.");
