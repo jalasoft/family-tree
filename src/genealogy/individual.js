@@ -34,6 +34,8 @@
     
     this.parentRelationship = undefined;
     this.relationships = [];
+
+    this.customAttributes = Object.create(null);
   };
 
   //--------------------------------------------------------------------------------------------------------------------------------
@@ -63,7 +65,32 @@
 
     return newRelationship;
   };
+  
+  //--------------------------------------------------------------------------------------------------------------------------------
 
+  Genealogy.internal.Individual.prototype.walk = function(visitor) {
+
+    if (!visitor) {
+      throw new TypeError("Visitor to walk throught inheritance tree must be defined.");
+    }
+
+    if (!visitor.enter || (typeof visitor.enter) !== "function") {
+      throw new TypeError("Visitor must have function 'enter(individual)'");
+    }
+
+    if (!visitor.leave || (typeof visitor.leave) !== "function") {
+      throw new TypeError("Visitor must have function 'leave(individual)'");
+    }
+
+    visitor.enter(this);
+
+    if (this.parentRelationship) {
+      this.parentRelationship.father.walk(visitor);
+      this.parentRelationship.mother.walk(visitor);
+    }
+
+    visitor.leave(this);
+  };
 
   //--------------------------------------------------------------------------------------------------------------------------------
   
@@ -107,6 +134,18 @@
       return `${this.name}_${this.surname}_${this.birth}`;
     }
   });
+
+  //--------------------------------------------------------------------------------------------------------------------------------
+
+  Genealogy.internal.Individual.prototype.setAttribute = function(key, value) {
+    this.customAttributes[key] = value;
+  };
+
+  //--------------------------------------------------------------------------------------------------------------------------------
+
+  Genealogy.internal.Individual.prototype.getAttribute = function(key) {
+    return this.customAttributes[key];
+  };
 
   //--------------------------------------------------------------------------------------------------------------------------------
 

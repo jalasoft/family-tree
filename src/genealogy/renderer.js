@@ -1,6 +1,6 @@
   
   
-  Genealogy.renderFamilyTree = function(individual, config) {
+  Genealogy.constructFamilyTree = function(individual, config) {
     if (!(individual instanceof Genealogy.internal.Individual)) {
       throw new TypeError("A starting person of a family tree must be an individual.");
     }
@@ -41,15 +41,25 @@
       '100': 'white'
     });
 
-    Genealogy.internal.render(painter, individual, nodeStyle, nodePosition);
+    Genealogy.internal.renderer.render(painter, individual, nodeStyle, nodePosition);
 
-    document.querySelector(config.el).appendChild(painter.svg);
+    let walker = new Genealogy.internal.renderer.Walker();
+    individual.walk(walker);
+
+    let buckets = walker.buckets;
+    console.log(buckets);
+
+    return {
+      el: painter.svg
+    };
 };
 
+Genealogy.internal.renderer = {};
+
 //--------------------------------------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------------------------------------
 
-Genealogy.internal.render = function(painter, individual, style, position) {
+Genealogy.internal.renderer.render = function(painter, individual, style, position) {
       
       var envelope_stroke = "#e0e0eb";
       var envelope_fill = "transparent";
@@ -133,4 +143,30 @@ Genealogy.internal.render = function(painter, individual, style, position) {
         'text-anchor': 'middle',
         'font-size': data_font_size
       });
+  };
+
+  //-------------------------------------------------------------------------------------------------------------
+
+  Genealogy.internal.renderer.Walker = function() {
+    this.buckets = [];
+    this.level = 0;
+  };
+
+  Genealogy.internal.renderer.Walker.prototype.enter = function(individual) {
+    if (!this.buckets[this.level]) {
+      this.buckets[this.level] = [];
+    }
+
+    this.buckets[this.level].push(individual);
+    this.level++;
+  };
+
+  Genealogy.internal.renderer.Walker.prototype.leave = function(individual) {
+    this.level--;
+  };
+
+  //-------------------------------------------------------------------------------------------------------------
+  
+  Genealogy.internal.renderer.CoordinatesResolver = function(buckets) {
+    //dfd
   };

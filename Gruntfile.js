@@ -4,7 +4,7 @@ module.exports = function(grunt) {
 		concat: {
 			dist: {
 				src: ['src/genealogy/main.js', 'src/genealogy/individual.js', 'src/genealogy/relationship.js', 'src/genealogy/renderer.js'],
-				dest: 'views/static/genealogy.js'
+				dest: 'static/js/genealogy.js'
 			}
 		},
 		copy: {
@@ -12,22 +12,18 @@ module.exports = function(grunt) {
 				files: [
 					{
 						src: ['src/main.html'],
-						dest: 'views/main.html'
+						dest: 'static/main.html'
 					},
 					{
 						src: ['src/svg_pencil/svg_pencil.js'],
-						dest: 'views/static/svg_pencil.js'
-					},
-					{
-						src: 'src/ext/bootstrap.css',
-						dest: 'views/static/bootstrap.css'
+						dest: 'static/js/svg_pencil.js'
 					}
 					]
 			}
 		},
 		watch: {
 			files: ['src/genealogy/*.js', 'src/svg_pencil/*.js', 'src/main.html'],
-			tasks: ['concat:dist', 'copy:dist']
+			tasks: ['jshint', 'concat:dist', 'copy:dist']
 		},
 		jshint: {
 			options: {
