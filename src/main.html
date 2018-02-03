@@ -47,25 +47,41 @@
       var tata = Genealogy.newMale({
         name: "Jiri",
         surname: "Lastovicka",
-        birth: "16.4.1952"
+        birth: {
+          day: 16,
+          month: 4,
+          year: 1952
+        }
       });
 
       var mama = Genealogy.newFemale({
         name: "Eva",
         surname: "Navratilova",
-        birth: "14.9.1951"
+        birth: {
+          day: 14,
+          month: 9,
+          year: 1951
+        }
       });
 
       var ja = Genealogy.newMale({
         name: "Honza", 
         surname: "Laštovička", 
-        birth: "11.11.1983"
+        birth: {
+          day: 11,
+          month: 11,
+          year: 1983
+        }
       });
 
       var monika = Genealogy.newFemale({
         name: "Monika",
         surname: "Lastovickova",
-        birth: "6.6.1976"
+        birth: {
+          day: 6,
+          month: 6, 
+          year: 1976
+        }
       });
 
       tata.inRelationWith(mama).having(ja).having(monika);
@@ -73,14 +89,26 @@
       var babickaN = Genealogy.newFemale({
         name: "Eva",
         surname: "Hamplova",
-        birth: "28.10. 1930"
+        birth: {
+          day: 28,
+          month: 10,
+          year: 1930
+        }
       });
 
       var josefN = Genealogy.newMale({
         name: "Josef",
         surname: "Navratil",
-        birth: "11.5. 1923",
-        decease: "25.12. 1969"
+        birth: {
+          day: 11,
+          month: 5,
+          year: 1923
+        },
+        decease: {
+          day: 25,
+          month: 12,
+          year: 1969
+        }
       });
 
       josefN.inRelationWith(babickaN).having(mama);
@@ -88,14 +116,31 @@
       var babickaC = Genealogy.newFemale({
         name: "Marie",
         surname: "Leinmullerova",
-        birth: "14.3. 1927"
+        birth: {
+          day: 14,
+          month: 3,
+          year: 1927
+        },
+        decease: {
+          day: 14,
+          month: 9,
+          year: 2001
+        }
       });
 
       dedaL = Genealogy.newMale({
         name: "Josef",
         surname: "Lastovicka",
-        birth: "16.8. 1922",
-        decease: "19.7.1997"
+        birth: {
+          day: 16,
+          month: 8,
+          year: 1922
+        },
+        decease: {
+          day: 19,
+          month: 7,
+          year: 1997
+        }
       });
 
 
@@ -120,7 +165,7 @@
 
       let tree = Genealogy.constructFamilyTree(ja, {
         width: "100%",
-        height: "100%"
+        height: "400"
       });
 
       document.querySelector("#familytree").appendChild(tree.el);

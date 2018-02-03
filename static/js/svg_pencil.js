@@ -1,6 +1,7 @@
 const SVGPainter = (function(){
 
 	var NS = "http://www.w3.org/2000/svg";
+	var XlinkNS = "http://www.w3.org/1999/xlink";
 	
 	var initDocument = function(config) {
 		//var parent = document.querySelector(config.el);
@@ -8,6 +9,7 @@ const SVGPainter = (function(){
 		//parent.appendChild(svg);
 
 		svg.setAttribute("xmlns", NS);
+		svg.setAttribute("xmlns:xlink", XlinkNS);
 		svg.setAttribute('width', config.width);
 		svg.setAttribute('height', config.height);	
 		//
@@ -24,6 +26,7 @@ const SVGPainter = (function(){
 	return {
 		SVGDocument: function(config) {
 			this.NS = NS;
+			this.XlinkNS = XlinkNS;
 			this.applyAttributes = attributesApplier;
 			this.svg = initDocument(config);
 
@@ -51,6 +54,15 @@ SVGPainter.SVGDocument.prototype.text = function(value, config) {
 	prim.appendChild(textNode);
 
 	this.svg.appendChild(prim);
+	return prim;
+};
+
+SVGPainter.SVGDocument.prototype.image = function(config) {
+	var prim = document.createElementNS(this.NS, "image");
+
+	this.applyAttributes(prim, config);
+	this.svg.appendChild(prim);
+
 	return prim;
 };
 
@@ -82,3 +94,4 @@ SVGPainter.SVGDocument.prototype.linearGradient = function(config) {
 
 	this.svg.insertAdjacentElement('afterbegin', gradientElement);
 };
+

@@ -6,8 +6,7 @@ Genealogy.internal = {};
       throw new TypeError("Config must not be undefined or null when a new male is about to be created.");
     }
 
-    config.gender = Genealogy.GENDER_MALE;
-    return new Genealogy.internal.Individual(config);
+    return new Genealogy.internal.Individual(Genealogy.GENDER_MALE, config);
   };
 
   Genealogy.newFemale = function(config) {
@@ -15,8 +14,7 @@ Genealogy.internal = {};
       throw new TypeError("Config must not be undefined or null when a new female is about to be created.");
     }
 
-    config.gender = Genealogy.GENDER_FEMALE;
-    return new Genealogy.internal.Individual(config);
+    return new Genealogy.internal.Individual(Genealogy.GENDER_FEMALE, config);
   };
 
   Genealogy.GENDER_MALE = "male";
@@ -26,13 +24,32 @@ Genealogy.internal = {};
   //--------------------------------------------------------------------------------------------------------------------------------
   //--------------------------------------------------------------------------------------------------------------------------------
 
-  Genealogy.internal.Individual = function(config) {
-  
-    this.name = config.name ? config.name : "????";
-    this.surname = config.surname ? config.surname : "????";
-    this.birth = config.birth ? config.birth : "????";
-    this.decease = config.decease ? config.decease : "????";
-    this.gender = config.gender ? config.gender : "????";
+  Genealogy.internal.dateToStringPropertyDefinition = {
+    value: function() {
+      var day = this.day && this.month ? this.day + "." + this.month + "." : "";
+      return day + this.year;
+    }
+  };
+
+  Genealogy.internal.Individual = function(gender, config) {
+    if (!config.surname) {
+      throw new TypeError("At least surname must be known when defining a person.");
+    }
+
+    this.name = config.name ? config.name : undefined;
+    this.surname = config.surname;
+
+    if (config.birth) {
+      this.birth = Object.assign({}, config.birth);
+      Object.defineProperty(this.birth, "toString", Genealogy.internal.dateToStringPropertyDefinition);
+    }
+
+    if (this.decease) {
+      this.decease = Object.assign({}, config.decease);
+      Object.defineProperty(this.decease, "toString", Genealogy.internal.dateToStringPropertyDefinition);
+    }
+
+    this.gender = gender;
     
     this.parentRelationship = undefined;
     this.relationships = [];
@@ -133,7 +150,20 @@ Genealogy.internal = {};
     enumerable: true,
     configurable: false,
     get() {
-      return `${this.name}_${this.surname}_${this.birth}`;
+
+      var name;
+      if (this.name) {
+        name = this.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "") + "_";
+      } else {
+        name = "";
+      }
+
+      var surname = this.surname.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+
+      var birthYear = this.birth && this.birth.year ? "_" + this.birth.year: "";
+      var deceaseYear = this.decease && this.decease.year ? "_" + this.decease.year : "";
+
+      return `${name}${surname}${birthYear}${deceaseYear}`;
     }
   });
 
@@ -219,8 +249,7 @@ Genealogy.internal.Relationship.prototype.addChild = function(child) {
     }
 
     var nodeStyle = {
-      node_width: 150,
-      node_height: 80
+      node_size: 150,
     };
 
     var nodePosition = {
@@ -271,91 +300,118 @@ Genealogy.internal.renderer = {};
 
 //--------------------------------------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------------------------------------
-
+  
 Genealogy.internal.renderer.render = function(painter, individual, style, position) {
       
       var envelope_stroke = "#e0e0eb";
       var envelope_fill = "transparent";
 
-      //envelope
-      
+
+
+      var picture_width = style.node_size * 0.60;
+      var picture_height = style.node_size * 0.60;    
+      var picture_x = position.x + ((style.node_size - picture_width) / 2);
+      var picture_y = position.y;      
+
+
+      var imageUrl = window.location.origin + "/individual/" + individual.id + ".jpg";
+
+      painter.image({
+        x: picture_x,
+        y: picture_y,
+        width: picture_width,
+        height: picture_height,
+        href: imageUrl
+      });
+
+      var info_envelope_x = position.x;
+      var info_envelope_y = position.y + picture_height;
+      var info_envelope_width = style.node_size;
+      var info_envelope_height = style.node_size * 0.5;
+
       painter.rectangle({
-        x: position.x,
-        y: position.y,
+        x: info_envelope_x,
+        y: info_envelope_y,
         rx: 8,
         ry: 8,
-        width: style.node_width,
-        height: style.node_height,
+        width: info_envelope_width,
+        height: info_envelope_height,
         stroke: envelope_stroke,
         fill: envelope_fill
       });
 
-      var gap = style.node_width * 0.06;
-      var content_x = position.x + (gap / 2);
-      var content_y = position.y + (gap / 2);
-      var content_width = style.node_width - gap;
-      var content_height = style.node_height - gap;
+      
+      var gap = (info_envelope_width * 0.06) / 2;
+      var info_x = position.x + gap;
+      var info_y = picture_y + picture_height + gap;
+      var info_width = info_envelope_width - (2 * gap);
+      var info_height = info_envelope_height - (2 * gap);
       var genderGradientId = individual.isMale() ? 'male' : 'female';
 
       //content
       
       painter.rectangle({
-        x: content_x,
-        y: content_y,
+        x: info_x,
+        y: info_y,
         rx: 8,
         ry: 8,
-        width: content_width,
-        height: content_height,
+        width: info_width,
+        height: info_height,
         'stroke-width': 0,
         fill: 'url(#'+genderGradientId + ')'
       });
 
-
-      var content_text_x = position.x + (style.node_width / 2); 
-      var name_font_size = 0.2 * content_height;
-      var name_y = content_y + (0.25 * content_height);
+      
+      var info_text_x = position.x + (style.node_size / 2); 
+      var name_font_size = 0.2 * info_envelope_height;
+      var info_name_y = info_y + (0.25 * info_height);
 
       //name
       painter.text(individual.name, {
-        x: content_text_x,
-        y: name_y,
+        x: info_text_x,
+        y: info_name_y,
         'text-anchor': 'middle',
         'font-weight': 'bold',
         'font-size': name_font_size
       });
  
-      var surname_y = content_y + (0.5 * content_height);
+
+      var info_surname_y = info_y + (0.5 * info_height);
       //surname
       painter.text(individual.surname, {
-        x: content_text_x,
-        y: surname_y,
+        x: info_text_x,
+        y: info_surname_y,
         'text-anchor': 'middle',
         'font-weight': 'bold',
         'font-size': name_font_size
       });
 
-      var data_font_size = 0.15 * content_height;
+      var data_font_size = 0.15 * info_envelope_height;
 
-      var birth_y = content_y + (0.75 * content_height);
-      var birthText = "* " + individual.birth;
+      if (individual.birth) {
+        var birth_y = info_y + (0.75 * info_height);
+        var birthText = "* " + individual.birth.toString();
 
-      //birth
-      painter.text(birthText, {
-        x: content_text_x,
-        y: birth_y,
-        'text-anchor': 'middle',
-        'font-size': data_font_size
-      });     
+        //birth
+        painter.text(birthText, {
+          x: info_text_x,
+          y: birth_y,
+          'text-anchor': 'middle',
+          'font-size': data_font_size
+        });     
+      }
 
-      //decease day
-      var decease_y = content_y + (0.92 * content_height);
-      var deceaseText = "+ " + individual.decease;
-      painter.text(deceaseText, {
-        x: content_text_x,
-        y: decease_y,
-        'text-anchor': 'middle',
-        'font-size': data_font_size
-      });
+      if (individual.decease) {
+        var decease_y = info_y + (0.92 * content_height);
+        var deceaseText = "+ " + individual.decease;
+      
+        painter.text(deceaseText, {
+          x: info_text_x,
+          y: decease_y,
+          'text-anchor': 'middle',
+          'font-size': data_font_size
+        });
+      }
   };
 
   //-------------------------------------------------------------------------------------------------------------

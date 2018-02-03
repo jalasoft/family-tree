@@ -3,6 +3,7 @@ const express = require("express");
 const app = express();
 
 app.use("/main.html", express.static("src/main.html"));
+app.use("/individual", express.static("static/individual"));
 app.use("/static", express.static("static"));
 
 app.get("/", (reg, resp) => {

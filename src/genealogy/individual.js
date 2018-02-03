@@ -4,8 +4,7 @@
       throw new TypeError("Config must not be undefined or null when a new male is about to be created.");
     }
 
-    config.gender = Genealogy.GENDER_MALE;
-    return new Genealogy.internal.Individual(config);
+    return new Genealogy.internal.Individual(Genealogy.GENDER_MALE, config);
   };
 
   Genealogy.newFemale = function(config) {
@@ -13,8 +12,7 @@
       throw new TypeError("Config must not be undefined or null when a new female is about to be created.");
     }
 
-    config.gender = Genealogy.GENDER_FEMALE;
-    return new Genealogy.internal.Individual(config);
+    return new Genealogy.internal.Individual(Genealogy.GENDER_FEMALE, config);
   };
 
   Genealogy.GENDER_MALE = "male";
@@ -24,13 +22,32 @@
   //--------------------------------------------------------------------------------------------------------------------------------
   //--------------------------------------------------------------------------------------------------------------------------------
 
-  Genealogy.internal.Individual = function(config) {
-  
-    this.name = config.name ? config.name : "????";
-    this.surname = config.surname ? config.surname : "????";
-    this.birth = config.birth ? config.birth : "????";
-    this.decease = config.decease ? config.decease : "????";
-    this.gender = config.gender ? config.gender : "????";
+  Genealogy.internal.dateToStringPropertyDefinition = {
+    value: function() {
+      var day = this.day && this.month ? this.day + "." + this.month + "." : "";
+      return day + this.year;
+    }
+  };
+
+  Genealogy.internal.Individual = function(gender, config) {
+    if (!config.surname) {
+      throw new TypeError("At least surname must be known when defining a person.");
+    }
+
+    this.name = config.name ? config.name : undefined;
+    this.surname = config.surname;
+
+    if (config.birth) {
+      this.birth = Object.assign({}, config.birth);
+      Object.defineProperty(this.birth, "toString", Genealogy.internal.dateToStringPropertyDefinition);
+    }
+
+    if (this.decease) {
+      this.decease = Object.assign({}, config.decease);
+      Object.defineProperty(this.decease, "toString", Genealogy.internal.dateToStringPropertyDefinition);
+    }
+
+    this.gender = gender;
     
     this.parentRelationship = undefined;
     this.relationships = [];
@@ -131,7 +148,20 @@
     enumerable: true,
     configurable: false,
     get() {
-      return `${this.name}_${this.surname}_${this.birth}`;
+
+      var name;
+      if (this.name) {
+        name = this.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "") + "_";
+      } else {
+        name = "";
+      }
+
+      var surname = this.surname.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+
+      var birthYear = this.birth && this.birth.year ? "_" + this.birth.year: "";
+      var deceaseYear = this.decease && this.decease.year ? "_" + this.decease.year : "";
+
+      return `${name}${surname}${birthYear}${deceaseYear}`;
     }
   });
 
