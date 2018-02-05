@@ -21,7 +21,7 @@
 		Y = 100
 		SIZE = 200 
 	-->
-	<image xlink:href="http://localhost:8986/static/individual/ja.jpg" x="170" y="100" height="70px" width="70px"/>
+	<image xlink:href="http://localhost:8986/individual/honza_la%C5%A1tovi%C4%8Dka_1983.jpg" x="170" y="100" height="70px" width="70px"/>
 
 	<rect id="envelope" x="100" y="170" rx="8" ry="8" width="200" height="100" fill="transparent" stroke="#e0e0eb"/>
 	<rect id="content" x="106" y="176" rx="8" ry="8" width="188" height="88" fill="url(#male)" stroke="transparent" stroke-width="0"/>
@@ -31,5 +31,7 @@
 
   	<text x="200" y="242" text-anchor="middle" font-size="13.2">* 11.11. 1983</text>
   	<text x="200" y="259.6" text-anchor="middle" font-size="13.2">+ ??.??. ????</text>
+
+	<line x1="10" y1="10" x2="100" y2="100"/>
 
 </svg>

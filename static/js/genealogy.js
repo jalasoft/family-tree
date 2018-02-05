@@ -38,13 +38,14 @@ Genealogy.internal = {};
 
     this.name = config.name ? config.name : undefined;
     this.surname = config.surname;
-
+    this.hasImage = config.hasImage;
+    
     if (config.birth) {
       this.birth = Object.assign({}, config.birth);
       Object.defineProperty(this.birth, "toString", Genealogy.internal.dateToStringPropertyDefinition);
     }
 
-    if (this.decease) {
+    if (config.decease) {
       this.decease = Object.assign({}, config.decease);
       Object.defineProperty(this.decease, "toString", Genealogy.internal.dateToStringPropertyDefinition);
     }
@@ -241,6 +242,306 @@ Genealogy.internal.Relationship.prototype.addChild = function(child) {
   return this;
 };
 
+
+Genealogy.internal.node = Genealogy.internal.node || {};
+
+//----------------------------------------------------------------------------------------------------------------------
+
+Genealogy.internal.node.IndividualNode = function(individual) {
+		this.individual = individual;
+};
+
+//----------------------------------------------------------------------------------------------------------------------
+
+Genealogy.internal.node.IndividualNode.prototype.colors = {
+	infoEnvelopeStroke: "#e0e0eb",
+    infoEnvelopeFill: "transparent"
+};
+
+Genealogy.internal.node.IndividualNode.prototype.sizes = (function() {
+	
+	var size = 150;
+	
+	var width = size;
+    var height = size * 1.04;
+    
+    var pictureWidth = size * 0.54;
+	var pictureHeight = pictureWidth;
+
+	var infoEnvelopeWidth = size;
+	var infoEnvelopeHeight = size * 0.5;
+
+	var gap = (infoEnvelopeWidth * 0.06) / 2;
+
+	var infoWidth = infoEnvelopeWidth - (2 * gap);
+	var infoHeight = infoEnvelopeHeight - (2 * gap);
+
+	var nameFontSize = 0.2 * infoEnvelopeHeight;
+	var dataFontSize = 0.15 * infoEnvelopeHeight;
+
+	var textAnchorX = infoWidth / 2;
+
+	var nameAnchorY = pictureHeight + gap + infoHeight * 0.25; 
+	var surnameAnchorY = pictureHeight + gap + infoHeight * 0.5;
+	var birthAnchorY = pictureHeight + gap + infoHeight * 0.75;
+	var deceaseAnchorY = pictureHeight + gap + infoHeight * 0.92;
+
+	return {
+		size: size,
+	
+		width: width,
+    	height: height,
+    
+    	pictureWidth: pictureWidth,
+		pictureHeight: pictureHeight,
+
+		infoEnvelopeWidth: infoEnvelopeWidth,
+		infoEnvelopeHeight: infoEnvelopeHeight,
+
+		infoWidth: infoWidth,
+		infoHeight: infoHeight,
+
+		gap: gap,
+
+		nameFontSize: nameFontSize,
+
+		textAnchorX: textAnchorX,
+		dataFontSize: dataFontSize,
+		
+		nameAnchorY: nameAnchorY,
+		surnameAnchorY: surnameAnchorY,
+		birthAnchorY: birthAnchorY,
+		deceaseAnchorY: deceaseAnchorY
+	};
+})();
+
+//----------------------------------------------------------------------------------------------------------------------
+
+Object.defineProperty(Genealogy.internal.node.IndividualNode.prototype, "width", {
+	enumerable: true,
+	get() {
+		return this.sizes.width;
+	}
+});
+
+//----------------------------------------------------------------------------------------------------------------------
+
+Genealogy.internal.node.IndividualNode.prototype.render = function(pencil, x, y) {
+	this.renderImage(pencil, x, y);
+	this.renderInfoEnvelopeBox(pencil, x, y);
+	this.renderInfoBox(pencil, x, y);
+	this.renderName(pencil, x, y);
+	this.renderSurname(pencil, x, y);
+	this.renderBirth(pencil, x, y);
+    this.renderDecease(pencil, x, y);  
+};
+
+//----------------------------------------------------------------------------------------------------------------------
+
+Genealogy.internal.node.IndividualNode.prototype.renderImage = function(pencil, x, y) {
+	if (!this.individual.hasImage) {
+		return;
+	}
+
+    var x_pos = x + ((this.sizes.width - this.sizes.pictureWidth) / 2);
+    var y_pos = y;
+    var imageUrl = window.location.origin + "/individual/" + this.individual.id + ".jpg";
+
+    pencil.image({
+        	x: x_pos,
+        	y: y_pos,
+        	width: this.sizes.pictureWidth,
+        	height: this.sizes.pictureHeight,
+        	href: imageUrl
+        	});	
+};
+
+Genealogy.internal.node.IndividualNode.prototype.renderInfoEnvelopeBox = function(pencil, x, y) {
+	var x_pos = x;
+    var y_pos = y + this.sizes.pictureHeight;
+
+    pencil.rectangle({
+        x: x_pos,
+        y: y_pos,
+        rx: 8,
+        ry: 8,
+        width: this.sizes.infoEnvelopeWidth,
+        height: this.sizes.infoEnvelopeHeight,
+        stroke: this.colors.infoEnvelopeStroke,
+        fill: this.colors.infoEnvelopeFill
+      });
+};
+
+Genealogy.internal.node.IndividualNode.prototype.renderInfoBox = function(pencil, x, y) {
+      var x_pos = x + this.sizes.gap;
+      var y_pos = y + this.sizes.pictureHeight + this.sizes.gap;
+
+      var genderGradientId = this.individual.isMale() ? 'male' : 'female';
+
+      //info
+      pencil.rectangle({
+        x: x_pos,
+        y: y_pos,
+        rx: 8,
+        ry: 8,
+        width: this.sizes.infoWidth,
+        height: this.sizes.infoHeight,
+        'stroke-width': 0,
+        fill: 'url(#'+genderGradientId + ')'
+      });
+};
+
+Genealogy.internal.node.IndividualNode.prototype.renderName = function(pencil, x, y) {
+		
+	var x_pos = x + this.sizes.textAnchorX;
+	var y_pos = y + this.sizes.nameAnchorY;
+
+     pencil.text(this.individual.name, {
+        x: x_pos,
+        y: y_pos,
+        'text-anchor': 'middle',
+        'font-weight': 'bold',
+        'font-size': this.sizes.nameFontSize
+      });
+};
+
+Genealogy.internal.node.IndividualNode.prototype.renderSurname = function(pencil, x, y) {
+		
+	var x_pos = x + this.sizes.textAnchorX;
+	var y_pos = y + this.sizes.surnameAnchorY;
+
+     pencil.text(this.individual.surname, {
+        x: x_pos,
+        y: y_pos,
+        'text-anchor': 'middle',
+        'font-weight': 'bold',
+        'font-size': this.sizes.nameFontSize
+      });
+};
+
+Genealogy.internal.node.IndividualNode.prototype.renderBirth = function(pencil, x, y) {
+	if (!this.individual.birth) {
+		return;
+	}
+
+	var x_pos = x + this.sizes.textAnchorX;
+	var y_pos = y + this.sizes.birthAnchorY;
+    var birthText = "* " + this.individual.birth.toString();
+
+    pencil.text(birthText, {
+          x: x_pos,
+          y: y_pos,
+          'text-anchor': 'middle',
+          'font-size': this.sizes.dataFontSize
+        });     
+};
+
+Genealogy.internal.node.IndividualNode.prototype.renderDecease = function(pencil, x, y) {
+	if (!this.individual.decease) {
+		return;
+	}
+
+	var x_pos = x + this.sizes.textAnchorX;
+	var y_pos = y + this.sizes.deceaseAnchorY;
+
+    var deceaseText = "+ " + this.individual.decease;
+      
+    pencil.text(deceaseText, {
+          x: x_pos,
+          y: y_pos,
+          'text-anchor': 'middle',
+          'font-size': this.sizes.dataFontSize
+     });
+};
+
+Genealogy.internal.node.IndividualNode.prototype.siblingsConnectorCoordinates = function(x, y) {
+	return {
+		x: x + (this.sizes.width / 2),
+		y: y + this.sizes.height
+	};
+};
+Genealogy.internal.node = Genealogy.internal.node || {};
+
+Genealogy.internal.node.SiblingsNode = function(individual_node) {
+	if (!individual_node) {
+		throw new TypeError("Individual must be defined.");
+	}
+
+	this.leader = individual_node;
+	
+	var siblingNodes = individual_node.individual.siblings.map(i => new Genealogy.internal.node.IndividualNode(i));
+	this.all = [individual_node, ...siblingNodes];
+};
+
+Genealogy.internal.node.SiblingsNode.prototype.colors = (function() {
+	var lineColor = "#e0e0eb";
+
+	return {
+		lineColor: "#e0e0eb"
+	};
+})();
+
+Genealogy.internal.node.SiblingsNode.prototype.sizes = (function() {
+
+	var gap = 10;
+	var siblingConnectorLength = 30;
+	
+
+	return {
+		gap: gap,
+		siblingConnectorLength: siblingConnectorLength,
+		lineColor: "#e0e0eb"
+	};
+})();
+
+Genealogy.internal.node.SiblingsNode.prototype.render = function(pencil, x, y) {
+	var actualX = x;
+	var previousLineCoordinates;
+
+	this.all.forEach(i => {
+		i.render(pencil, actualX, y);
+		const lineCoordinates = this.renderSiblingConnector(pencil, actualX, y, i);
+
+		if (previousLineCoordinates) {
+			this.renderSiblingConnectorConnection(pencil, lineCoordinates, previousLineCoordinates);
+		}
+
+		previousLineCoordinates = lineCoordinates;
+		actualX += i.width + this.sizes.gap;
+	});
+};
+
+Genealogy.internal.node.SiblingsNode.prototype.renderSiblingConnector = function(pencil, x, y, individual_node) {
+
+	var coordinates = individual_node.siblingsConnectorCoordinates(x, y);
+
+	var lineCoordinates = {
+		x1: coordinates.x,
+		y1: coordinates.y,
+		x2: coordinates.x,
+		y2: coordinates.y + this.sizes.siblingConnectorLength
+	};
+
+	pencil.line({
+		x1: lineCoordinates.x1,
+		y1: lineCoordinates.y1,
+		x2: lineCoordinates.x2,
+		y2: lineCoordinates.y2,
+		stroke: this.colors.lineColor
+	});
+
+	return lineCoordinates;
+};
+
+Genealogy.internal.node.SiblingsNode.prototype.renderSiblingConnectorConnection = function(pencil, lineCoordinates, previousLineCoordinates) {
+	pencil.line({
+		x1: previousLineCoordinates.x2,
+		y1: previousLineCoordinates.y2,
+		x2: lineCoordinates.x2,
+		y2: lineCoordinates.y2,
+		stroke: this.colors.lineColor
+	});
+};
   
   
   Genealogy.constructFamilyTree = function(individual, config) {
@@ -283,138 +584,33 @@ Genealogy.internal.Relationship.prototype.addChild = function(child) {
       '100': 'white'
     });
 
-    Genealogy.internal.renderer.render(painter, individual, nodeStyle, nodePosition);
 
+    var personalNode = new Genealogy.internal.node.IndividualNode(individual);
+    
+    var siblingsNode = new Genealogy.internal.node.SiblingsNode(personalNode);
+    siblingsNode.render(painter, 50, 50);
+
+    /*
+    Genealogy.internal.renderer.render(painter, individual, nodeStyle, nodePosition);
+    */
+    /*
     let walker = new Genealogy.internal.renderer.Walker();
     individual.walk(walker);
-
     let buckets = walker.buckets;
     console.log(buckets);
-
+*/
     return {
-      el: painter.svg
+      el: painter.svg,
+      listeners: [],
+      addSelectionListener: function(listener) {
+        this.listeners.push(listener);
+      }
     };
 };
 
-Genealogy.internal.renderer = {};
-
-//--------------------------------------------------------------------------------------------------------------------------------
-//--------------------------------------------------------------------------------------------------------------------------------
-  
-Genealogy.internal.renderer.render = function(painter, individual, style, position) {
-      
-      var envelope_stroke = "#e0e0eb";
-      var envelope_fill = "transparent";
-
-
-
-      var picture_width = style.node_size * 0.60;
-      var picture_height = style.node_size * 0.60;    
-      var picture_x = position.x + ((style.node_size - picture_width) / 2);
-      var picture_y = position.y;      
-
-
-      var imageUrl = window.location.origin + "/individual/" + individual.id + ".jpg";
-
-      painter.image({
-        x: picture_x,
-        y: picture_y,
-        width: picture_width,
-        height: picture_height,
-        href: imageUrl
-      });
-
-      var info_envelope_x = position.x;
-      var info_envelope_y = position.y + picture_height;
-      var info_envelope_width = style.node_size;
-      var info_envelope_height = style.node_size * 0.5;
-
-      painter.rectangle({
-        x: info_envelope_x,
-        y: info_envelope_y,
-        rx: 8,
-        ry: 8,
-        width: info_envelope_width,
-        height: info_envelope_height,
-        stroke: envelope_stroke,
-        fill: envelope_fill
-      });
-
-      
-      var gap = (info_envelope_width * 0.06) / 2;
-      var info_x = position.x + gap;
-      var info_y = picture_y + picture_height + gap;
-      var info_width = info_envelope_width - (2 * gap);
-      var info_height = info_envelope_height - (2 * gap);
-      var genderGradientId = individual.isMale() ? 'male' : 'female';
-
-      //content
-      
-      painter.rectangle({
-        x: info_x,
-        y: info_y,
-        rx: 8,
-        ry: 8,
-        width: info_width,
-        height: info_height,
-        'stroke-width': 0,
-        fill: 'url(#'+genderGradientId + ')'
-      });
-
-      
-      var info_text_x = position.x + (style.node_size / 2); 
-      var name_font_size = 0.2 * info_envelope_height;
-      var info_name_y = info_y + (0.25 * info_height);
-
-      //name
-      painter.text(individual.name, {
-        x: info_text_x,
-        y: info_name_y,
-        'text-anchor': 'middle',
-        'font-weight': 'bold',
-        'font-size': name_font_size
-      });
- 
-
-      var info_surname_y = info_y + (0.5 * info_height);
-      //surname
-      painter.text(individual.surname, {
-        x: info_text_x,
-        y: info_surname_y,
-        'text-anchor': 'middle',
-        'font-weight': 'bold',
-        'font-size': name_font_size
-      });
-
-      var data_font_size = 0.15 * info_envelope_height;
-
-      if (individual.birth) {
-        var birth_y = info_y + (0.75 * info_height);
-        var birthText = "* " + individual.birth.toString();
-
-        //birth
-        painter.text(birthText, {
-          x: info_text_x,
-          y: birth_y,
-          'text-anchor': 'middle',
-          'font-size': data_font_size
-        });     
-      }
-
-      if (individual.decease) {
-        var decease_y = info_y + (0.92 * content_height);
-        var deceaseText = "+ " + individual.decease;
-      
-        painter.text(deceaseText, {
-          x: info_text_x,
-          y: decease_y,
-          'text-anchor': 'middle',
-          'font-size': data_font_size
-        });
-      }
-  };
-
   //-------------------------------------------------------------------------------------------------------------
+
+  Genealogy.internal.renderer = {};
 
   Genealogy.internal.renderer.Walker = function() {
     this.buckets = [];
@@ -426,16 +622,14 @@ Genealogy.internal.renderer.render = function(painter, individual, style, positi
       this.buckets[this.level] = [];
     }
 
-    this.buckets[this.level].push(individual);
+    var node = new Genealogy.internal.node.SiblingsNode(individual);
+    
+    this.buckets[this.level].push(node);
     this.level++;
   };
 
   Genealogy.internal.renderer.Walker.prototype.leave = function(individual) {
     this.level--;
   };
-
   //-------------------------------------------------------------------------------------------------------------
-  
-  Genealogy.internal.renderer.CoordinatesResolver = function(buckets) {
-    //dfd
-  };
+

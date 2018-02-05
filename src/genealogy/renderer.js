@@ -40,138 +40,33 @@
       '100': 'white'
     });
 
-    Genealogy.internal.renderer.render(painter, individual, nodeStyle, nodePosition);
 
+    var personalNode = new Genealogy.internal.node.IndividualNode(individual);
+    
+    var siblingsNode = new Genealogy.internal.node.SiblingsNode(personalNode);
+    siblingsNode.render(painter, 50, 50);
+
+    /*
+    Genealogy.internal.renderer.render(painter, individual, nodeStyle, nodePosition);
+    */
+    /*
     let walker = new Genealogy.internal.renderer.Walker();
     individual.walk(walker);
-
     let buckets = walker.buckets;
     console.log(buckets);
-
+*/
     return {
-      el: painter.svg
+      el: painter.svg,
+      listeners: [],
+      addSelectionListener: function(listener) {
+        this.listeners.push(listener);
+      }
     };
 };
 
-Genealogy.internal.renderer = {};
-
-//--------------------------------------------------------------------------------------------------------------------------------
-//--------------------------------------------------------------------------------------------------------------------------------
-  
-Genealogy.internal.renderer.render = function(painter, individual, style, position) {
-      
-      var envelope_stroke = "#e0e0eb";
-      var envelope_fill = "transparent";
-
-
-
-      var picture_width = style.node_size * 0.60;
-      var picture_height = style.node_size * 0.60;    
-      var picture_x = position.x + ((style.node_size - picture_width) / 2);
-      var picture_y = position.y;      
-
-
-      var imageUrl = window.location.origin + "/individual/" + individual.id + ".jpg";
-
-      painter.image({
-        x: picture_x,
-        y: picture_y,
-        width: picture_width,
-        height: picture_height,
-        href: imageUrl
-      });
-
-      var info_envelope_x = position.x;
-      var info_envelope_y = position.y + picture_height;
-      var info_envelope_width = style.node_size;
-      var info_envelope_height = style.node_size * 0.5;
-
-      painter.rectangle({
-        x: info_envelope_x,
-        y: info_envelope_y,
-        rx: 8,
-        ry: 8,
-        width: info_envelope_width,
-        height: info_envelope_height,
-        stroke: envelope_stroke,
-        fill: envelope_fill
-      });
-
-      
-      var gap = (info_envelope_width * 0.06) / 2;
-      var info_x = position.x + gap;
-      var info_y = picture_y + picture_height + gap;
-      var info_width = info_envelope_width - (2 * gap);
-      var info_height = info_envelope_height - (2 * gap);
-      var genderGradientId = individual.isMale() ? 'male' : 'female';
-
-      //content
-      
-      painter.rectangle({
-        x: info_x,
-        y: info_y,
-        rx: 8,
-        ry: 8,
-        width: info_width,
-        height: info_height,
-        'stroke-width': 0,
-        fill: 'url(#'+genderGradientId + ')'
-      });
-
-      
-      var info_text_x = position.x + (style.node_size / 2); 
-      var name_font_size = 0.2 * info_envelope_height;
-      var info_name_y = info_y + (0.25 * info_height);
-
-      //name
-      painter.text(individual.name, {
-        x: info_text_x,
-        y: info_name_y,
-        'text-anchor': 'middle',
-        'font-weight': 'bold',
-        'font-size': name_font_size
-      });
- 
-
-      var info_surname_y = info_y + (0.5 * info_height);
-      //surname
-      painter.text(individual.surname, {
-        x: info_text_x,
-        y: info_surname_y,
-        'text-anchor': 'middle',
-        'font-weight': 'bold',
-        'font-size': name_font_size
-      });
-
-      var data_font_size = 0.15 * info_envelope_height;
-
-      if (individual.birth) {
-        var birth_y = info_y + (0.75 * info_height);
-        var birthText = "* " + individual.birth.toString();
-
-        //birth
-        painter.text(birthText, {
-          x: info_text_x,
-          y: birth_y,
-          'text-anchor': 'middle',
-          'font-size': data_font_size
-        });     
-      }
-
-      if (individual.decease) {
-        var decease_y = info_y + (0.92 * content_height);
-        var deceaseText = "+ " + individual.decease;
-      
-        painter.text(deceaseText, {
-          x: info_text_x,
-          y: decease_y,
-          'text-anchor': 'middle',
-          'font-size': data_font_size
-        });
-      }
-  };
-
   //-------------------------------------------------------------------------------------------------------------
+
+  Genealogy.internal.renderer = {};
 
   Genealogy.internal.renderer.Walker = function() {
     this.buckets = [];
@@ -183,16 +78,14 @@ Genealogy.internal.renderer.render = function(painter, individual, style, positi
       this.buckets[this.level] = [];
     }
 
-    this.buckets[this.level].push(individual);
+    var node = new Genealogy.internal.node.SiblingsNode(individual);
+    
+    this.buckets[this.level].push(node);
     this.level++;
   };
 
   Genealogy.internal.renderer.Walker.prototype.leave = function(individual) {
     this.level--;
   };
-
   //-------------------------------------------------------------------------------------------------------------
-  
-  Genealogy.internal.renderer.CoordinatesResolver = function(buckets) {
-    //dfd
-  };
+

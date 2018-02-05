@@ -3,7 +3,7 @@ module.exports = function(grunt) {
 	grunt.initConfig({
 		concat: {
 			dist: {
-				src: ['src/genealogy/main.js', 'src/genealogy/individual.js', 'src/genealogy/relationship.js', 'src/genealogy/renderer.js'],
+				src: ['src/genealogy/main.js', 'src/genealogy/individual.js', 'src/genealogy/relationship.js', 'src/genealogy/individual_node.js', 'src/genealogy/siblings_node.js', 'src/genealogy/renderer.js'],
 				dest: 'static/js/genealogy.js'
 			}
 		},

@@ -95,3 +95,13 @@ SVGPainter.SVGDocument.prototype.linearGradient = function(config) {
 	this.svg.insertAdjacentElement('afterbegin', gradientElement);
 };
 
+SVGPainter.SVGDocument.prototype.line = function(config) {
+
+	var prim = document.createElementNS(this.NS, "line");
+	this.applyAttributes(prim, config);
+
+	this.svg.appendChild(prim);
+
+	return prim;
+};
+

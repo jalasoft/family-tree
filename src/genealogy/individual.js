@@ -36,13 +36,14 @@
 
     this.name = config.name ? config.name : undefined;
     this.surname = config.surname;
-
+    this.hasImage = config.hasImage;
+    
     if (config.birth) {
       this.birth = Object.assign({}, config.birth);
       Object.defineProperty(this.birth, "toString", Genealogy.internal.dateToStringPropertyDefinition);
     }
 
-    if (this.decease) {
+    if (config.decease) {
       this.decease = Object.assign({}, config.decease);
       Object.defineProperty(this.decease, "toString", Genealogy.internal.dateToStringPropertyDefinition);
     }
