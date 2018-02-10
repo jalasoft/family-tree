@@ -14,7 +14,7 @@ Genealogy.internal.node.IndividualNode.prototype.colors = {
     infoEnvelopeFill: "transparent"
 };
 
-Genealogy.internal.node.IndividualNode.prototype.sizes = (function() {
+Genealogy.internal.node.IndividualNode.prototype.geometry = (function() {
 	
 	var size = 150;
 	
@@ -73,15 +73,6 @@ Genealogy.internal.node.IndividualNode.prototype.sizes = (function() {
 
 //----------------------------------------------------------------------------------------------------------------------
 
-Object.defineProperty(Genealogy.internal.node.IndividualNode.prototype, "width", {
-	enumerable: true,
-	get() {
-		return this.sizes.width;
-	}
-});
-
-//----------------------------------------------------------------------------------------------------------------------
-
 Genealogy.internal.node.IndividualNode.prototype.render = function(pencil, x, y) {
 	this.renderImage(pencil, x, y);
 	this.renderInfoEnvelopeBox(pencil, x, y);
@@ -99,38 +90,38 @@ Genealogy.internal.node.IndividualNode.prototype.renderImage = function(pencil, 
 		return;
 	}
 
-    var x_pos = x + ((this.sizes.width - this.sizes.pictureWidth) / 2);
+    var x_pos = x + ((this.geometry.width - this.geometry.pictureWidth) / 2);
     var y_pos = y;
     var imageUrl = window.location.origin + "/individual/" + this.individual.id + ".jpg";
 
     pencil.image({
         	x: x_pos,
         	y: y_pos,
-        	width: this.sizes.pictureWidth,
-        	height: this.sizes.pictureHeight,
+        	width: this.geometry.pictureWidth,
+        	height: this.geometry.pictureHeight,
         	href: imageUrl
         	});	
 };
 
 Genealogy.internal.node.IndividualNode.prototype.renderInfoEnvelopeBox = function(pencil, x, y) {
 	var x_pos = x;
-    var y_pos = y + this.sizes.pictureHeight;
+    var y_pos = y + this.geometry.pictureHeight;
 
     pencil.rectangle({
         x: x_pos,
         y: y_pos,
         rx: 8,
         ry: 8,
-        width: this.sizes.infoEnvelopeWidth,
-        height: this.sizes.infoEnvelopeHeight,
+        width: this.geometry.infoEnvelopeWidth,
+        height: this.geometry.infoEnvelopeHeight,
         stroke: this.colors.infoEnvelopeStroke,
         fill: this.colors.infoEnvelopeFill
       });
 };
 
 Genealogy.internal.node.IndividualNode.prototype.renderInfoBox = function(pencil, x, y) {
-      var x_pos = x + this.sizes.gap;
-      var y_pos = y + this.sizes.pictureHeight + this.sizes.gap;
+      var x_pos = x + this.geometry.gap;
+      var y_pos = y + this.geometry.pictureHeight + this.geometry.gap;
 
       var genderGradientId = this.individual.isMale() ? 'male' : 'female';
 
@@ -140,8 +131,8 @@ Genealogy.internal.node.IndividualNode.prototype.renderInfoBox = function(pencil
         y: y_pos,
         rx: 8,
         ry: 8,
-        width: this.sizes.infoWidth,
-        height: this.sizes.infoHeight,
+        width: this.geometry.infoWidth,
+        height: this.geometry.infoHeight,
         'stroke-width': 0,
         fill: 'url(#'+genderGradientId + ')'
       });
@@ -149,29 +140,29 @@ Genealogy.internal.node.IndividualNode.prototype.renderInfoBox = function(pencil
 
 Genealogy.internal.node.IndividualNode.prototype.renderName = function(pencil, x, y) {
 		
-	var x_pos = x + this.sizes.textAnchorX;
-	var y_pos = y + this.sizes.nameAnchorY;
+	var x_pos = x + this.geometry.textAnchorX;
+	var y_pos = y + this.geometry.nameAnchorY;
 
      pencil.text(this.individual.name, {
         x: x_pos,
         y: y_pos,
         'text-anchor': 'middle',
         'font-weight': 'bold',
-        'font-size': this.sizes.nameFontSize
+        'font-size': this.geometry.nameFontSize
       });
 };
 
 Genealogy.internal.node.IndividualNode.prototype.renderSurname = function(pencil, x, y) {
 		
-	var x_pos = x + this.sizes.textAnchorX;
-	var y_pos = y + this.sizes.surnameAnchorY;
+	var x_pos = x + this.geometry.textAnchorX;
+	var y_pos = y + this.geometry.surnameAnchorY;
 
      pencil.text(this.individual.surname, {
         x: x_pos,
         y: y_pos,
         'text-anchor': 'middle',
         'font-weight': 'bold',
-        'font-size': this.sizes.nameFontSize
+        'font-size': this.geometry.nameFontSize
       });
 };
 
@@ -180,15 +171,15 @@ Genealogy.internal.node.IndividualNode.prototype.renderBirth = function(pencil, 
 		return;
 	}
 
-	var x_pos = x + this.sizes.textAnchorX;
-	var y_pos = y + this.sizes.birthAnchorY;
+	var x_pos = x + this.geometry.textAnchorX;
+	var y_pos = y + this.geometry.birthAnchorY;
     var birthText = "* " + this.individual.birth.toString();
 
     pencil.text(birthText, {
           x: x_pos,
           y: y_pos,
           'text-anchor': 'middle',
-          'font-size': this.sizes.dataFontSize
+          'font-size': this.geometry.dataFontSize
         });     
 };
 
@@ -197,8 +188,8 @@ Genealogy.internal.node.IndividualNode.prototype.renderDecease = function(pencil
 		return;
 	}
 
-	var x_pos = x + this.sizes.textAnchorX;
-	var y_pos = y + this.sizes.deceaseAnchorY;
+	var x_pos = x + this.geometry.textAnchorX;
+	var y_pos = y + this.geometry.deceaseAnchorY;
 
     var deceaseText = "+ " + this.individual.decease;
       
@@ -206,13 +197,13 @@ Genealogy.internal.node.IndividualNode.prototype.renderDecease = function(pencil
           x: x_pos,
           y: y_pos,
           'text-anchor': 'middle',
-          'font-size': this.sizes.dataFontSize
+          'font-size': this.geometry.dataFontSize
      });
 };
 
 Genealogy.internal.node.IndividualNode.prototype.siblingsConnectorCoordinates = function(x, y) {
 	return {
-		x: x + (this.sizes.width / 2),
-		y: y + this.sizes.height
+		x: x + (this.geometry.width / 2),
+		y: y + this.geometry.height
 	};
 };

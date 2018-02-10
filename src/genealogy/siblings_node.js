@@ -1,6 +1,6 @@
 Genealogy.internal.node = Genealogy.internal.node || {};
 
-Genealogy.internal.node.SiblingsNode = function(individual_node) {
+Genealogy.internal.node.IndividualWithSiblingsNode = function(individual_node) {
 	if (!individual_node) {
 		throw new TypeError("Individual must be defined.");
 	}
@@ -11,7 +11,9 @@ Genealogy.internal.node.SiblingsNode = function(individual_node) {
 	this.all = [individual_node, ...siblingNodes];
 };
 
-Genealogy.internal.node.SiblingsNode.prototype.colors = (function() {
+//----------------------------------------------------------------------------------------------------------------------
+
+Genealogy.internal.node.IndividualWithSiblingsNode.prototype.colors = (function() {
 	var lineColor = "#e0e0eb";
 
 	return {
@@ -19,7 +21,7 @@ Genealogy.internal.node.SiblingsNode.prototype.colors = (function() {
 	};
 })();
 
-Genealogy.internal.node.SiblingsNode.prototype.sizes = (function() {
+Genealogy.internal.node.IndividualWithSiblingsNode.prototype.geometry = (function() {
 
 	var gap = 10;
 	var siblingConnectorLength = 30;
@@ -27,56 +29,52 @@ Genealogy.internal.node.SiblingsNode.prototype.sizes = (function() {
 
 	return {
 		gap: gap,
-		siblingConnectorLength: siblingConnectorLength,
-		lineColor: "#e0e0eb"
+		siblingConnectorLength: siblingConnectorLength
 	};
 })();
 
-Genealogy.internal.node.SiblingsNode.prototype.render = function(pencil, x, y) {
-	var actualX = x;
-	var previousLineCoordinates;
+Genealogy.internal.node.IndividualWithSiblingsNode.prototype.forEachNode = function(x, y, fn) {
+ 	var actualX = x;
+ 	this.all.forEach(function(individualNode) {
+		fn.call(this, actualX, y, individualNode);
 
-	this.all.forEach(i => {
-		i.render(pencil, actualX, y);
-		const lineCoordinates = this.renderSiblingConnector(pencil, actualX, y, i);
+		const offset = individualNode.geometry.width + this.geometry.gap;
+		actualX += offset;
+	}.bind(this));
 
-		if (previousLineCoordinates) {
-			this.renderSiblingConnectorConnection(pencil, lineCoordinates, previousLineCoordinates);
+};
+
+//----------------------------------------------------------------------------------------------------------------------
+
+Genealogy.internal.node.IndividualWithSiblingsNode.prototype.render = function(pencil, x, y) {
+	
+	let previousCoordinates;
+
+	this.forEachNode(x, y, function(x, y, node) {
+		node.render(pencil, x, y);
+
+		const coordinates = node.siblingsConnectorCoordinates(x, y);
+		
+		//vertical line
+		pencil.line({
+			x1: coordinates.x,
+			y1: coordinates.y,
+			x2: coordinates.x,
+			y2: coordinates.y + this.geometry.siblingConnectorLength,
+			stroke: this.colors.lineColor
+		});
+
+		//horizontal line
+		if (previousCoordinates) {
+			pencil.line({
+				x1: previousCoordinates.x,
+				y1: previousCoordinates.y + this.geometry.siblingConnectorLength,
+				x2: coordinates.x,
+				y2: coordinates.y + this.geometry.siblingConnectorLength,
+				stroke: this.colors.lineColor
+			});
 		}
 
-		previousLineCoordinates = lineCoordinates;
-		actualX += i.width + this.sizes.gap;
-	});
-};
-
-Genealogy.internal.node.SiblingsNode.prototype.renderSiblingConnector = function(pencil, x, y, individual_node) {
-
-	var coordinates = individual_node.siblingsConnectorCoordinates(x, y);
-
-	var lineCoordinates = {
-		x1: coordinates.x,
-		y1: coordinates.y,
-		x2: coordinates.x,
-		y2: coordinates.y + this.sizes.siblingConnectorLength
-	};
-
-	pencil.line({
-		x1: lineCoordinates.x1,
-		y1: lineCoordinates.y1,
-		x2: lineCoordinates.x2,
-		y2: lineCoordinates.y2,
-		stroke: this.colors.lineColor
-	});
-
-	return lineCoordinates;
-};
-
-Genealogy.internal.node.SiblingsNode.prototype.renderSiblingConnectorConnection = function(pencil, lineCoordinates, previousLineCoordinates) {
-	pencil.line({
-		x1: previousLineCoordinates.x2,
-		y1: previousLineCoordinates.y2,
-		x2: lineCoordinates.x2,
-		y2: lineCoordinates.y2,
-		stroke: this.colors.lineColor
+		previousCoordinates = coordinates;
 	});
 };

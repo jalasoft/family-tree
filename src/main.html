@@ -6,6 +6,7 @@
 
       <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.css">
       <script src="/static/js/svg_pencil.js"></script>
+      <script src="/static/js/hierarchydiagram.js"></script>
       <script src="/static/js/genealogy.js"></script>
       
     </head>
@@ -85,7 +86,9 @@
         }
       });
 
-      tata.inRelationWith(mama).having(ja).having(monika);
+      tata.inRelationWith(mama).having(ja).having(monika).since({
+        year: 1974
+      });
 
       var babickaN = Genealogy.newFemale({
         name: "Eva",
@@ -153,14 +156,52 @@
       console.log(tata);
       console.log(mama);
 */
-      /*
+      
+      var relationsStack = [];
+      var allRelations = [];
+
+      var topology = new Genealogy.internal.renderer.TopologyFactory();
+      ja.walk(topology);
+      console.log(topology.layers);
+/*
       ja.walk({
-        enter: function(i) {
-          console.log("Vstupuju: " + i.id);
+
+        
+
+        enter: function(individual) {
+          //console.log("Vstupuju: " + individual.id);
+          
+          var triangle = {
+              individual: individual,
+              fatherTriangle: undefined,
+              motherTriangle: undefined
+          };
+
+
+          if (relationsStack.length > 0) {
+            let previousTriangle = [...relationsStack].pop();
+
+            if (individual.isMale()) {
+              previousTriangle.fatherTriangle = triangle;
+            }
+
+            if (individual.isFemale()) {
+              previousTriangle.motherTriangle = triangle;
+            }
+
+          }
+
+          relationsStack.push(triangle);
+          allRelations.push(triangle);
         },
 
         leave: function(i) {
-          console.log("Opoustim:" + i.id);
+          //console.log("Opoustim:" + i.id);
+
+          var vztah = relationsStack.pop();
+          //stack.pop();
+
+          //console.log(vztah);
         }
       });*/
 

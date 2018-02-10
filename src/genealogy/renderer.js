@@ -43,7 +43,7 @@
 
     var personalNode = new Genealogy.internal.node.IndividualNode(individual);
     
-    var siblingsNode = new Genealogy.internal.node.SiblingsNode(personalNode);
+    var siblingsNode = new Genealogy.internal.node.IndividualWithSiblingsNode(personalNode);
     siblingsNode.render(painter, 50, 50);
 
     /*
@@ -68,24 +68,62 @@
 
   Genealogy.internal.renderer = {};
 
-  Genealogy.internal.renderer.Walker = function() {
-    this.buckets = [];
-    this.level = 0;
-  };
-
-  Genealogy.internal.renderer.Walker.prototype.enter = function(individual) {
-    if (!this.buckets[this.level]) {
-      this.buckets[this.level] = [];
-    }
-
-    var node = new Genealogy.internal.node.SiblingsNode(individual);
+  Genealogy.internal.renderer.TopologyFactory = (function() {
     
-    this.buckets[this.level].push(node);
-    this.level++;
-  };
+    var newVertex = function(individual, isLead) {
+        return new HierarchyDiagram.Vertex({
+          name: individual.name,
+          surname: individual.surname,
+          birth: individual.birth,
+          decease: individual.decease,
+          gender: individual.gender
+        }, isLead);
+    };
 
-  Genealogy.internal.renderer.Walker.prototype.leave = function(individual) {
-    this.level--;
-  };
+    var newUnion = function(individual, level) {
+        var vertex = newVertex(individual, true); 
+        var siblingVertices = individual.siblings.map(s => newVertex(s, false));
+            
+        return new HierarchyDiagram.Union([vertex, ...siblingVertices]);
+    };
+
+    return function () {
+        this.level = 0;
+        this.stack = [];
+        this.layers = [];
+        
+        this.enter = function(individual) {
+    
+            var union = newUnion(individual, this.level);
+            
+            if (this.stack.length > 0) {
+              let childUnion = [...this.stack].pop();
+
+              if (individual.isMale()) {
+                childUnion.addNextUnion("m", union);
+              }
+
+              if (individual.isFemale()) {
+                childUnion.addNextUnion("f", union);
+              }
+            }
+
+            this.stack.push(union);
+
+            if (!this.layers[this.level]) {
+              this.layers[this.level] = [];
+            }
+            this.layers[this.level].push(union);
+
+            this.level++;
+        };
+
+        this.leave = function(individual) {
+            this.level--;
+            this.stack.pop();
+        };
+    };
+  })();
+
   //-------------------------------------------------------------------------------------------------------------
 

@@ -22,13 +22,6 @@
   //--------------------------------------------------------------------------------------------------------------------------------
   //--------------------------------------------------------------------------------------------------------------------------------
 
-  Genealogy.internal.dateToStringPropertyDefinition = {
-    value: function() {
-      var day = this.day && this.month ? this.day + "." + this.month + "." : "";
-      return day + this.year;
-    }
-  };
-
   Genealogy.internal.Individual = function(gender, config) {
     if (!config.surname) {
       throw new TypeError("At least surname must be known when defining a person.");
@@ -39,21 +32,17 @@
     this.hasImage = config.hasImage;
     
     if (config.birth) {
-      this.birth = Object.assign({}, config.birth);
-      Object.defineProperty(this.birth, "toString", Genealogy.internal.dateToStringPropertyDefinition);
+      this.birth = new Genealogy.internal.Date(config.birth);
     }
 
     if (config.decease) {
-      this.decease = Object.assign({}, config.decease);
-      Object.defineProperty(this.decease, "toString", Genealogy.internal.dateToStringPropertyDefinition);
+      this.decease = new Genealogy.internal.Date(config.decease);
     }
 
     this.gender = gender;
-    
     this.parentRelationship = undefined;
     this.relationships = [];
 
-    this.customAttributes = Object.create(null);
   };
 
   //--------------------------------------------------------------------------------------------------------------------------------
@@ -102,8 +91,16 @@
 
     visitor.enter(this);
 
-    if (this.parentRelationship) {
+    if (!this.parentRelationship) {
+      visitor.leave(this);
+      return;
+    }
+
+    if (this.parentRelationship.father) {
       this.parentRelationship.father.walk(visitor);
+    }
+
+    if (this.parentRelationship.mother) {
       this.parentRelationship.mother.walk(visitor);
     }
 
@@ -165,18 +162,16 @@
       return `${name}${surname}${birthYear}${deceaseYear}`;
     }
   });
-
+  //--------------------------------------------------------------------------------------------------------------------------------
   //--------------------------------------------------------------------------------------------------------------------------------
 
-  Genealogy.internal.Individual.prototype.setAttribute = function(key, value) {
-    this.customAttributes[key] = value;
+  Genealogy.internal.Date = function(config) {
+    this.day = config.day;
+    this.month = config.month;
+    this.year = config.year;
   };
 
-  //--------------------------------------------------------------------------------------------------------------------------------
-
-  Genealogy.internal.Individual.prototype.getAttribute = function(key) {
-    return this.customAttributes[key];
+  Genealogy.internal.Date.prototype.toString = function() {
+      var day = this.day && this.month ? this.day + "." + this.month + "." : "";
+      return day + this.year;
   };
-
-  //--------------------------------------------------------------------------------------------------------------------------------
-

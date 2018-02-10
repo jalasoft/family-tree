@@ -43,11 +43,12 @@ Genealogy.internal.Relationship = function(config) {
 
 
 
-Genealogy.internal.Relationship.prototype.since = function(date) {
-    this.since = date;
+Genealogy.internal.Relationship.prototype.since = function(config) {
+    this.since = new Genealogy.internal.Date(config);
     return this;
 };
 
+/*
 Genealogy.internal.Relationship.prototype.addChild = function(child) {
   if (!(child instanceof Genealogy.internal.Individual)) {
     throw new TypeError("Individual expected as a child to be added to a relationship.");
@@ -55,4 +56,4 @@ Genealogy.internal.Relationship.prototype.addChild = function(child) {
 
   this.children.push(child);
   return this;
-};
+};*/

@@ -3,7 +3,13 @@ module.exports = function(grunt) {
 	grunt.initConfig({
 		concat: {
 			dist: {
-				src: ['src/genealogy/main.js', 'src/genealogy/individual.js', 'src/genealogy/relationship.js', 'src/genealogy/individual_node.js', 'src/genealogy/siblings_node.js', 'src/genealogy/renderer.js'],
+				src: [
+				'src/genealogy/main.js', 
+				'src/genealogy/individual.js', 
+				'src/genealogy/relationship.js', 
+				'src/genealogy/individual_node.js', 
+				'src/genealogy/siblings_node.js', 
+				'src/genealogy/renderer.js'],
 				dest: 'static/js/genealogy.js'
 			}
 		},
@@ -17,12 +23,16 @@ module.exports = function(grunt) {
 					{
 						src: ['src/svg_pencil/svg_pencil.js'],
 						dest: 'static/js/svg_pencil.js'
+					},
+					{
+						src: ['src/hierarchydiagram/hierarchydiagram.js'],
+						dest: 'static/js/hierarchydiagram.js'
 					}
 					]
 			}
 		},
 		watch: {
-			files: ['src/genealogy/*.js', 'src/svg_pencil/*.js', 'src/main.html'],
+			files: ['src/genealogy/*.js', 'src/svg_pencil/*.js', 'src/hierarchydiagram/hierarchydiagram.js', 'src/main.html'],
 			tasks: ['jshint', 'concat:dist', 'copy:dist']
 		},
 		jshint: {
