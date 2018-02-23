@@ -4,7 +4,7 @@
       throw new TypeError("Config must not be undefined or null when a new male is about to be created.");
     }
 
-    return new Genealogy.internal.Individual(Genealogy.GENDER_MALE, config);
+    return new Genealogy.Individual(Genealogy.GENDER_MALE, config);
   };
 
   Genealogy.newFemale = function(config) {
@@ -12,7 +12,7 @@
       throw new TypeError("Config must not be undefined or null when a new female is about to be created.");
     }
 
-    return new Genealogy.internal.Individual(Genealogy.GENDER_FEMALE, config);
+    return new Genealogy.Individual(Genealogy.GENDER_FEMALE, config);
   };
 
   Genealogy.GENDER_MALE = "male";
@@ -22,7 +22,7 @@
   //--------------------------------------------------------------------------------------------------------------------------------
   //--------------------------------------------------------------------------------------------------------------------------------
 
-  Genealogy.internal.Individual = function(gender, config) {
+  Genealogy.Individual = function(gender, config) {
     if (!config.surname) {
       throw new TypeError("At least surname must be known when defining a person.");
     }
@@ -32,11 +32,11 @@
     this.hasImage = config.hasImage;
     
     if (config.birth) {
-      this.birth = new Genealogy.internal.Date(config.birth);
+      this.birth = new Genealogy.Date(config.birth);
     }
 
     if (config.decease) {
-      this.decease = new Genealogy.internal.Date(config.decease);
+      this.decease = new Genealogy.Date(config.decease);
     }
 
     this.gender = gender;
@@ -47,25 +47,35 @@
 
   //--------------------------------------------------------------------------------------------------------------------------------
 
-  Genealogy.internal.Individual.prototype.isMale = function() {
+  Genealogy.Individual.prototype.isMale = function() {
     return this.gender == Genealogy.GENDER_MALE;
   };
 
   //--------------------------------------------------------------------------------------------------------------------------------
   
-  Genealogy.internal.Individual.prototype.isFemale = function() {
+  Genealogy.Individual.prototype.isFemale = function() {
     return this.gender == Genealogy.GENDER_FEMALE;
   };
 
   //--------------------------------------------------------------------------------------------------------------------------------
   
-  Genealogy.internal.Individual.prototype.inRelationWith = function(anotherIndividual) {
+  Genealogy.Individual.prototype.inRelationWith = function(anotherIndividual) {
   
-    if (!(anotherIndividual instanceof Genealogy.internal.Individual)) {
+    if (!(anotherIndividual instanceof Genealogy.Individual)) {
       throw new TypeError("Individual expected to be in a relationship.");
     }
 
-    var newRelationship = Genealogy.newRelationship(this, anotherIndividual);
+    if (this.gender == anotherIndividual.gender) {
+      throw new TypeError("Two individuals of the same sex cannot produce a child.");
+    }
+
+    var mother = this.isFemale() ? this : anotherIndividual;
+    var father = this.isMale() ? this : anotherIndividual;
+
+    var newRelationship = new Genealogy.Relationship({
+      father: father,
+      mother: mother
+    });
 
     this.relationships.push(newRelationship);
     anotherIndividual.relationships.push(newRelationship);
@@ -75,7 +85,7 @@
   
   //--------------------------------------------------------------------------------------------------------------------------------
 
-  Genealogy.internal.Individual.prototype.walk = function(visitor) {
+  Genealogy.Individual.prototype.traverseAncestors = function(visitor) {
 
     if (!visitor) {
       throw new TypeError("Visitor to walk throught inheritance tree must be defined.");
@@ -97,11 +107,11 @@
     }
 
     if (this.parentRelationship.father) {
-      this.parentRelationship.father.walk(visitor);
+      this.parentRelationship.father.traverseAncestors(visitor);
     }
 
     if (this.parentRelationship.mother) {
-      this.parentRelationship.mother.walk(visitor);
+      this.parentRelationship.mother.traverseAncestors(visitor);
     }
 
     visitor.leave(this);
@@ -109,13 +119,13 @@
 
   //--------------------------------------------------------------------------------------------------------------------------------
   
-  Genealogy.internal.Individual.prototype.toString = function() {
+  Genealogy.Individual.prototype.toString = function() {
     return `Individual[${this.id}]`;
   };
 
   //--------------------------------------------------------------------------------------------------------------------------------
   
-  Object.defineProperty(Genealogy.internal.Individual.prototype, "father", {
+  Object.defineProperty(Genealogy.Individual.prototype, "father", {
       enumerable: true,
       get() {
         return this.parentRelationship ? this.parentRelationship.father : undefined;
@@ -124,7 +134,7 @@
 
   //--------------------------------------------------------------------------------------------------------------------------------
   
-  Object.defineProperty(Genealogy.internal.Individual.prototype, "mother", {
+  Object.defineProperty(Genealogy.Individual.prototype, "mother", {
       enumerable: true,
       get() {
         return this.parentRelationship ? this.parentRelationship.mother : undefined;
@@ -133,7 +143,7 @@
 
   //--------------------------------------------------------------------------------------------------------------------------------
 
-  Object.defineProperty(Genealogy.internal.Individual.prototype, "siblings", {
+  Object.defineProperty(Genealogy.Individual.prototype, "siblings", {
       enumerable: true,
       get() {
         return this.parentRelationship ? this.parentRelationship.children.filter(s => s != this) : [];
@@ -142,7 +152,7 @@
 
   //--------------------------------------------------------------------------------------------------------------------------------
 
-  Object.defineProperty(Genealogy.internal.Individual.prototype, "id", {
+  Object.defineProperty(Genealogy.Individual.prototype, "id", {
     enumerable: true,
     configurable: false,
     get() {
@@ -165,13 +175,13 @@
   //--------------------------------------------------------------------------------------------------------------------------------
   //--------------------------------------------------------------------------------------------------------------------------------
 
-  Genealogy.internal.Date = function(config) {
+  Genealogy.Date = function(config) {
     this.day = config.day;
     this.month = config.month;
     this.year = config.year;
   };
 
-  Genealogy.internal.Date.prototype.toString = function() {
+  Genealogy.Date.prototype.toString = function() {
       var day = this.day && this.month ? this.day + "." + this.month + "." : "";
       return day + this.year;
   };

@@ -1,14 +1,17 @@
-var HierarchyDiagram = HierarchyDiagram || {};
+Genealogy.private.diagram = Genealogy.private.diagram || {};
 
 //HierarchyDiagram. = HierarchyDiagram.definition || {};
 
-HierarchyDiagram.Vertex = function(info, isLead) {
+Genealogy.private.diagram.Vertex = function(info, isLead) {
 	this.info = info;
 	this.isLead = isLead;
-//df
 };
 
-HierarchyDiagram.Union = function(vertices) {
+Genealogy.private.diagram.Vertex.toString = function() {
+	return `Vertex[lead=${this.isLead}, info=${this.info.toString()}]`;
+};
+
+Genealogy.private.diagram.Union = function(vertices) {
 	this.vertices = vertices;
 
 	var leads = vertices.filter(f => f.isLead);
@@ -23,7 +26,7 @@ HierarchyDiagram.Union = function(vertices) {
 	};
 };
 
-HierarchyDiagram.Union.prototype.addNextUnion = function(key, union) {
+Genealogy.private.diagram.Union.prototype.addNextUnion = function(key, union) {
 	this.nextUnions.map[key] = union;
 };
 

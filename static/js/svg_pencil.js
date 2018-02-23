@@ -1,4 +1,4 @@
-const SVGPainter = (function(){
+const SVGPencil = (function(){
 
 	var NS = "http://www.w3.org/2000/svg";
 	var XlinkNS = "http://www.w3.org/1999/xlink";
@@ -35,7 +35,7 @@ const SVGPainter = (function(){
 })();
 
 
-SVGPainter.SVGDocument.prototype.rectangle = function(config) {
+SVGPencil.SVGDocument.prototype.rectangle = function(config) {
 
 	var prim = document.createElementNS(this.NS, "rect");
 
@@ -45,7 +45,7 @@ SVGPainter.SVGDocument.prototype.rectangle = function(config) {
 	return prim;
 };
 
-SVGPainter.SVGDocument.prototype.text = function(value, config) {
+SVGPencil.SVGDocument.prototype.text = function(value, config) {
 	var prim = document.createElementNS(this.NS, "text");
 
 	this.applyAttributes(prim, config);
@@ -57,7 +57,7 @@ SVGPainter.SVGDocument.prototype.text = function(value, config) {
 	return prim;
 };
 
-SVGPainter.SVGDocument.prototype.image = function(config) {
+SVGPencil.SVGDocument.prototype.image = function(config) {
 	var prim = document.createElementNS(this.NS, "image");
 
 	this.applyAttributes(prim, config);
@@ -66,7 +66,7 @@ SVGPainter.SVGDocument.prototype.image = function(config) {
 	return prim;
 };
 
-SVGPainter.SVGDocument.prototype.linearGradient = function(config) {
+SVGPencil.SVGDocument.prototype.linearGradient = function(config) {
 
 
 	var gradientElement = document.createElementNS(this.NS, "linearGradient");
@@ -95,7 +95,7 @@ SVGPainter.SVGDocument.prototype.linearGradient = function(config) {
 	this.svg.insertAdjacentElement('afterbegin', gradientElement);
 };
 
-SVGPainter.SVGDocument.prototype.line = function(config) {
+SVGPencil.SVGDocument.prototype.line = function(config) {
 
 	var prim = document.createElementNS(this.NS, "line");
 	this.applyAttributes(prim, config);

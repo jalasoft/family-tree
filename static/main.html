@@ -6,7 +6,6 @@
 
       <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.css">
       <script src="/static/js/svg_pencil.js"></script>
-      <script src="/static/js/hierarchydiagram.js"></script>
       <script src="/static/js/genealogy.js"></script>
       
     </head>
@@ -132,7 +131,7 @@
         }
       });
 
-      dedaL = Genealogy.newMale({
+      var dedaL = Genealogy.newMale({
         name: "Josef",
         surname: "Lastovicka",
         birth: {
@@ -148,7 +147,15 @@
       });
 
 
-      babickaC.inRelationWith(dedaL).having(tata);
+      var iva = Genealogy.newFemale({
+        name: "Ivana",
+        surname: "Lastovickova",
+        birth: {
+          year: 1945
+        }
+      });
+
+      babickaC.inRelationWith(dedaL).having(tata).having(iva);
 
 /*
       console.log(ja);
@@ -156,13 +163,6 @@
       console.log(tata);
       console.log(mama);
 */
-      
-      var relationsStack = [];
-      var allRelations = [];
-
-      var topology = new Genealogy.internal.renderer.TopologyFactory();
-      ja.walk(topology);
-      console.log(topology.layers);
 /*
       ja.walk({
 
