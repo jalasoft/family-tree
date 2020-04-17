@@ -28,6 +28,18 @@ Viewer.embelish = (function() {
         this.newRoot.scroll(x, y);
     }
 
+    function onZoomIn() {
+        this.zoomStatus += this.zoomIncrement;
+        this.root.style.transformOrigin = "0 0";
+        this.root.style.transform = `scale(${this.zoomStatus})`;
+    }
+
+    function onZoomOut() {
+        this.zoomStatus -= this.zoomIncrement;
+        this.root.style.transformOrigin = "0 0  ";
+        this.root.style.transform = `scale(${this.zoomStatus})`;
+    }
+
     function replaceRootWithNewOne(root, newRoot) {
         const sibling = root.nextSibling;
         const parent = root.parentNode;
@@ -41,22 +53,41 @@ Viewer.embelish = (function() {
         newRoot.appendChild(root);
     }
 
+    function newFixedButton(title, left, top) {
+        const btn = document.createElement("button");
+        btn.innerText = title;
+        btn.style.position = "absolute";
+        btn.style.top = `${top}px`;
+        btn.style.left = `${left}px`;
+
+        this.newRoot.addEventListener('scroll', e => {
+            const floatedTop = this.newRoot.scrollTop + top;
+            const floatedLeft = this.newRoot.scrollLeft + left;
+            btn.style.top = `${floatedTop}px`;
+            btn.style.left = `${floatedLeft}px`;
+        });
+        return btn;
+    }
+
     return function(selector) {    
         if (typeof selector !== "string") {
             throw new Error("Only string can be accepted as a selector.");
         }
 
         const root = document.querySelector(selector);
-        
+
         const newRoot = document.createElement("div");
         newRoot.style.overflow = "auto";
+        newRoot.style.position = "relative";
 
         replaceRootWithNewOne(root, newRoot);
         
         const state = {
             isGrabbing: false,
             root: root,
-            newRoot: newRoot
+            newRoot: newRoot,
+            zoomStatus: 1,
+            zoomIncrement: 0.05
         };
 
         root.addEventListener('mouseup', onMouseUp.bind(state));
@@ -64,23 +95,14 @@ Viewer.embelish = (function() {
         root.addEventListener('mousemove', onMouseMove.bind(state));
         root.addEventListener('mouseleave', onMouseLeave.bind(state));
 
-        const pencil = new SVGPencil({
-            width: 100,
-            height: 100,
-        });
+        const zoomIn = newFixedButton.call(state, "+", 10, 10);
+        zoomIn.addEventListener('click', onZoomIn.bind(state));
 
-        pencil.circle({
-            cx: 50,
-            cy: 50,
-            r: 50
-        });
+        const zoomOut = newFixedButton.call(state, "-", 40, 10);
+        zoomOut.addEventListener('click', onZoomOut.bind(state));
 
-        pencil.el.style.position = "sticky";
-        pencil.el.style.top = "40px";
-        pencil.el.style.left = "40px";
-        pencil.el.style.zIndex = 2;
-
-        newRoot.appendChild(pencil.el);
+        newRoot.appendChild(zoomIn);
+        newRoot.appendChild(zoomOut);
     }
 })();
 
