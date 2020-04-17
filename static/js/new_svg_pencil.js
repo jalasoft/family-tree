@@ -3,16 +3,21 @@ const SVGPencil = (function(){
 	const NS = "http://www.w3.org/2000/svg";
 	const XlinkNS = "http://www.w3.org/1999/xlink";
 	
-	const initDocument = function(config) {
-		//var parent = document.querySelector(config.el);
-		var svg = document.createElementNS(NS, "svg");
-		//parent.appendChild(svg);
+	const createRootElement = function(config) {
+
+		const svg = document.createElementNS(NS, "svg");
 
 		svg.setAttribute("xmlns", NS);
 		svg.setAttribute("xmlns:xlink", XlinkNS);
-		svg.setAttribute('width', config.width);
-		svg.setAttribute('height', config.height);	
-		//
+		
+		if (config.width && config.height) {
+			svg.setAttribute('width', config.width);
+			svg.setAttribute('height', config.height);	
+		}
+
+		if (config.viewBox) {
+			svg.setAttribute('viewBox', config.viewBox);
+		}
 		return svg;
 	};	
 
@@ -23,29 +28,40 @@ const SVGPencil = (function(){
 		});
 	};
 
-	return {
-		SVGDocument: function(config) {
-			this.NS = NS;
-			this.XlinkNS = XlinkNS;
-			this.applyAttributes = attributesApplier;
-			this.svg = initDocument(config);
-
+	return function(config) {
+		if (this === window) {
+			throw new Error("SVGPencil must be created wtih new keyword.");
 		}
+
+		this.NS = NS;
+		this.XlinkNS = XlinkNS;
+		this.applyAttributes = attributesApplier;
+		this.el = createRootElement(config);
 	};
 })();
 
 
-SVGPencil.SVGDocument.prototype.rectangle = function(config) {
+SVGPencil.prototype.rectangle = function(config) {
 
 	var prim = document.createElementNS(this.NS, "rect");
 
 	this.applyAttributes(prim, config);
-	this.svg.appendChild(prim);
+	this.el.appendChild(prim);
 
 	return prim;
 };
 
-SVGPencil.SVGDocument.prototype.text = function(value, config) {
+SVGPencil.prototype.circle = function(config) {
+
+	const elm = document.createElementNS(this.NS, "circle");
+
+	this.applyAttributes(elm, config);
+	this.el.appendChild(elm);
+
+	return this;
+}
+
+SVGPencil.prototype.text = function(value, config) {
 	var prim = document.createElementNS(this.NS, "text");
 
 	this.applyAttributes(prim, config);
@@ -53,21 +69,26 @@ SVGPencil.SVGDocument.prototype.text = function(value, config) {
 	var textNode = document.createTextNode(value);
 	prim.appendChild(textNode);
 
-	this.svg.appendChild(prim);
+	this.el.appendChild(prim);
 	return prim;
 };
 
-SVGPencil.SVGDocument.prototype.image = function(config) {
+SVGPencil.prototype.image = function(config) {
 	var prim = document.createElementNS(this.NS, "image");
 
 	this.applyAttributes(prim, config);
-	this.svg.appendChild(prim);
+	this.el.appendChild(prim);
 
 	return prim;
 };
 
-SVGPencil.SVGDocument.prototype.linearGradient = function(config) {
+SVGPencil.prototype.linearGradientDef = function(config) {
 
+	/*
+	if (!this.defs) {
+		this.defs = document.createElement("defs");
+		this.el.insertAdjacentElement('afterbegin', this.defs);
+	}*/
 
 	var gradientElement = document.createElementNS(this.NS, "linearGradient");
 
@@ -92,15 +113,17 @@ SVGPencil.SVGDocument.prototype.linearGradient = function(config) {
 		gradientElement.appendChild(stopElement);
 	});
 
-	this.svg.insertAdjacentElement('afterbegin', gradientElement);
+	//this.defs.appendChild(gradientElement);
+	this.el.insertAdjacentElement('afterbegin', gradientElement);
+	return this;
 };
 
-SVGPencil.SVGDocument.prototype.line = function(config) {
+SVGPencil.prototype.line = function(config) {
 
 	var prim = document.createElementNS(this.NS, "line");
 	this.applyAttributes(prim, config);
 
-	this.svg.appendChild(prim);
+	this.el.appendChild(prim);
 
 	return prim;
 };
