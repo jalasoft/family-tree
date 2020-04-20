@@ -69,6 +69,8 @@ Viewer.embelish = (function() {
         return btn;
     }
 
+    //---------------------------------------------------------------------------
+
     return function(selector) {    
         if (typeof selector !== "string") {
             throw new Error("Only string can be accepted as a selector.");

@@ -4,7 +4,7 @@ const express = require("express");
 const app = express();
 
 const mainPagePath = path.resolve(__dirname, "static", "main.html");
-const svgPagePath = path.resolve(__dirname, "static", "svg.html");
+const treePagePath = path.resolve(__dirname, "static", "tree.html");
 const viewerPagePath = path.resolve(__dirname, "static", "viewer.html");
 
 app.use("/individual", express.static("static/individual"));
@@ -14,8 +14,8 @@ app.get("/", (reg, resp) => {
     resp.sendFile(mainPagePath);
 });
 
-app.get("/svg", (reg, resp) => {
-    resp.sendFile(svgPagePath);
+app.get("/tree", (reg, resp) => {
+    resp.sendFile(treePagePath);
 });
 
 app.get("/v", (reg, resp) => {
