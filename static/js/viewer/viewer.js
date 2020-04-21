@@ -71,7 +71,7 @@ Viewer.embelish = (function() {
 
     //---------------------------------------------------------------------------
 
-    return function(selector) {    
+    return function(selector, config) {    
         if (typeof selector !== "string") {
             throw new Error("Only string can be accepted as a selector.");
         }
@@ -89,7 +89,7 @@ Viewer.embelish = (function() {
             root: root,
             newRoot: newRoot,
             zoomStatus: 1,
-            zoomIncrement: 0.05
+            zoomIncrement: config && config.zoomIncrement ? config.zoomIncrement : 0.05
         };
 
         root.addEventListener('mouseup', onMouseUp.bind(state));
