@@ -8,8 +8,7 @@
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
         <script defer src="/static/js/viewer/viewer.js"></script>
-        <script defer src="/static/js/new_svg_pencil.js"></script>
-        <script defer src="/static/js/tree/tree.js"></script>
+        
     </head>
     <body>
         <div class="container">
@@ -22,7 +21,20 @@
                 <div class="col-1"></div>
             </div>
         </div>
+        <script src="/static/js/new_svg_pencil.js"></script>
+        <script src="/static/js/tree/tree.js"></script>
+        <script src="/static/js/tree/tree-layout.js"></script>
+        <script src="/static/js/tree/tree-examples.js"></script>
+        <script src="/static/js/tree/tree-renderer.js"></script>
+        <script>
 
+            const tree = BinaryTree.normalize(TreeExample.binaryTree5);
+            TreeLayout.wetherellShannon(tree.root, tree.height);
+            const svg = drawTree(tree.root);
+
+            const container = document.querySelector('#svg-container');
+            container.appendChild(svg);
+        </script>
 
     </body>
 </html>
