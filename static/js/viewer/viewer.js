@@ -79,9 +79,19 @@ Viewer.embelish = (function() {
         const root = document.querySelector(selector);
 
         const newRoot = document.createElement("div");
+
+
+        //let's move class tokens to the new roow from the 
+        //original root 
+        newRoot.classList.add(...root.classList);
+        root.removeAttribute('class');
+
+        newRoot.setAttribute('style', root.getAttribute('style'));
+        root.removeAttribute('style');
+
         newRoot.style.overflow = "auto";
         newRoot.style.position = "relative";
-
+        
         replaceRootWithNewOne(root, newRoot);
         
         const state = {

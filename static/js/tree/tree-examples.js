@@ -1,5 +1,71 @@
+
+function node(value, ...children) {
+    return {
+        value: value,
+        children: [...children]
+    }
+}
+
+function biNode(value, left, right) {
+    return {
+        value: value,
+        left: left,
+        right: right
+    }
+}
+
+
+
+
+
+/*
+const root = {
+    value: "A",
+    children: []
+}
+
+const B = {
+    value: "B",
+    children: []
+}
+
+const C = {
+    value = "C",
+    children: []
+}
+
+const D = {
+    value: "D",
+    children: []
+}
+
+const E = {
+    value: "E",
+    children: []
+}
+
+const F = {
+    value: "F",
+    children: []
+}
+
+const G = {
+    value: "G",
+    children: []
+}
+
+const I = {
+    value: "I",
+    children: []
+}
+
+const J = {
+    value: "J",
+    children: []
+}*/
+
 const TreeExample = {
-    tree: {
+    tree1: {
     value: "A",
     children: [
         {
@@ -30,6 +96,49 @@ const TreeExample = {
         }
     ]
 },
+
+tree2:  node("A", 
+            node("B", 
+                node("E"), 
+                node("F")
+            ), 
+            node("C"), 
+            node("D"),
+    ),
+tree3: node("A",
+        node("B",
+            node("G"),
+            node("H",
+                node("O"),
+                node("P"),
+                node("Q",
+                    node("U"),
+                    node("V"),
+                    node("W")
+                ),
+            ),
+            node("I",
+                node("R"),
+                node("S"),
+                node("T")
+            )
+        ),
+        node("C",
+            node("J",
+                node("X")
+            ),
+            node("K"),
+            node("L",
+                node("Y"),
+                node("Z")
+            )
+        ),
+        node("D"),
+        node("E"),
+        node("F",
+            node("M"),
+            node("N"))
+),
 
 binaryTree1: {
     value: "A",
@@ -148,4 +257,27 @@ binaryTree5: {
             }
         }
     }
-}}
+},
+
+binaryTree6:  
+biNode("A", 
+    biNode("B", 
+        biNode("D"), 
+        biNode("E",
+            undefined,
+            biNode("I",
+                undefined,
+                biNode("J")
+            )
+        )
+    ), 
+    biNode("C", 
+        undefined, 
+        biNode("F",
+            biNode("G",
+                biNode("H")
+            )
+        )
+    )
+)
+}

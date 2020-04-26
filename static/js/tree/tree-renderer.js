@@ -1,7 +1,7 @@
 function drawTree(root) {
     const pencil = new SVGPencil({
         width: 1200,
-        height: 700,
+        height: 300,
     });
 
     BinaryTree.dfsPreOrder(root, n => {

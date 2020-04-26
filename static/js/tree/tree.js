@@ -186,8 +186,8 @@ const BinaryTree = (function() {
     }
 })();
 
-const NTree = (function() {
-    function normalizeTree(root) {
+const Tree = (function() {
+    function normalizeTreeIter(root) {
 
         const stack = [];
         const newStack = [];
@@ -222,6 +222,85 @@ const NTree = (function() {
                 newCurrent.children.push(newNode);
             });
         }
-        return { root: newRoot, maxHeight: maxHeight}
+        return { root: newRoot, height: maxHeight}
+    }
+
+    function dfsPreOrderRec(node, cb, height = 0) {
+        cb(node, height);
+        node.children.forEach(ch => dfsPreOrderRec(ch, cb, height+1));
+    } 
+
+    function dfsPostOrderRec(node, cb, height = 0) {
+        node.children.forEach(ch => dfsPostOrderRec(ch, cb, height+1));
+        cb(node, height);
+    }
+
+    function dfsPreOrderIter(node, cb) {
+        walkTreeIter(node, {
+            pre: cb,
+            post: Function.prototype
+        });
+    }
+
+    function dfsPostOrderIter(node, cb) {
+        walkTreeIter(node, {
+            pre: Function.prototype,
+            post: cb
+        });
+    }
+
+    function walkTreeIter(node, cb) {
+    
+        let current = node;
+        let height = 0;
+
+        while(current) {
+
+            if (!current._) {
+                current._ = {
+                    status: -1
+                }
+            }
+
+            if (current._.status < 0) {
+                cb.pre(current, height);
+                current._.status = 0;
+            } else if (current._.status < current.children.length) {
+                const child = current.children[current._.status];
+                current._.status++;
+                height++;
+                current = child;
+            } else {
+                cb.post(current, height);
+                delete current._;
+                height--;
+                current = current.parent;
+            }
+        }
+    }
+
+    return {
+        strategy: "recursion",
+        normalize: function(root) {
+            return normalizeTreeIter(root);
+        },
+        dfsPreOrder: function(root, cb) {
+            if (this.strategy === "recursion") {
+                dfsPreOrderRec(root, cb);
+            } else if (this.strategy === "iteration") {
+                dfsPreOrderIter(root, cb);
+            } else {
+                throw new Error("Only 'recursion' or 'iteration' can be set a strategy");
+            }
+        },
+        dfsPostOrder: function(root, cb) {
+            if (this.strategy === "recursion") {
+                dfsPostOrderRec(root, cb);
+            } else if (this.strategy === "iteration") {
+                dfsPostOrderIter(root, cb);
+            } else {
+                throw new Error("Only 'recursion' or 'iteration' can be set a strategy");
+            }
+        }
     }
 })();

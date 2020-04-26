@@ -6,19 +6,19 @@
     
         <!-- Bootstrap CSS -->
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-
-        <script defer src="/static/js/viewer/viewer.js"></script>
-        
     </head>
     <body>
         <div class="container">
             <div class="row" style="height: 200px;"></div>
-            <div class="row">
-                <div class="col-1"></div>
-                <div id="svg-container" class="col-10 border bg-light" style="height: 250px;">
-                    
-                </div>
-                <div class="col-1"></div>
+            <div class="row" style="display: flex; flex-direction: row; flex-wrap: wrap;">
+                <!--<div class="col-1"></div>-->
+                <div id="svg-container1" class="border bg-light" style="flex: 1 1 150px;"></div>
+                <div id="svg-container2" class="border bg-light" style="flex: 1 1 150px;"></div>
+                <div id="svg-container3" class="border bg-light" style="flex: 1 1 150px;"></div> 
+                <div id="svg-container4" class="border bg-light" style="flex: 1 1 150px;"></div>
+                <div id="svg-container5" class="border bg-light" style="flex: 1 1 150px;"></div> 
+                <div id="svg-container6" class="border bg-light" style="flex: 1 1 150px;"></div> 
+                <!--<div class="col-1"></div>-->
             </div>
         </div>
         <script src="/static/js/new_svg_pencil.js"></script>
@@ -26,14 +26,35 @@
         <script src="/static/js/tree/tree-layout.js"></script>
         <script src="/static/js/tree/tree-examples.js"></script>
         <script src="/static/js/tree/tree-renderer.js"></script>
+        <script src="/static/js/viewer/viewer.js"></script>
         <script>
+            function normalizeAndDraw(root, selector) {
+                const tree = BinaryTree.normalize(root);
+                TreeLayout.wetherellShannon(tree.root, tree.height);
+                const svg = drawTree(tree.root);
 
-            const tree = BinaryTree.normalize(TreeExample.binaryTree5);
-            TreeLayout.wetherellShannon(tree.root, tree.height);
-            const svg = drawTree(tree.root);
+                const container = document.querySelector(selector);
+                container.appendChild(svg);
+            }
 
-            const container = document.querySelector('#svg-container');
-            container.appendChild(svg);
+            normalizeAndDraw(TreeExample.binaryTree1, '#svg-container1');
+            Viewer.embelish('#svg-container1');
+            normalizeAndDraw(TreeExample.binaryTree2, '#svg-container2');
+            Viewer.embelish('#svg-container2');
+            normalizeAndDraw(TreeExample.binaryTree3, '#svg-container3');
+            Viewer.embelish('#svg-container3');
+            normalizeAndDraw(TreeExample.binaryTree4, '#svg-container4');
+            Viewer.embelish('#svg-container4');
+            normalizeAndDraw(TreeExample.binaryTree5, '#svg-container5');
+            Viewer.embelish('#svg-container5');
+            normalizeAndDraw(TreeExample.binaryTree6, '#svg-container6');
+            Viewer.embelish('#svg-container6');
+
+            Tree.strategy = "iteration";
+            //const normalized = Tree.normalize(TreeExample.tree1);
+            //Tree.dfsPostOrder(normalized.root, (n, h) => console.log(`${n.value}: ${h}`));
+            console.log(JSON.stringify(TreeExample.tree3, null, 3));
+            //console.log(JSON.stringify(b, null, 3));
         </script>
 
     </body>
